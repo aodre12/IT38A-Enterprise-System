@@ -17,7 +17,7 @@
 
     <div class="main-content">
         <h1>Dashboard</h1>
-        <p>Welcome to your Dashboard.</p>
+        <p>Welcome to your UtiliTrack!</p>
     </div>
 
 </body>
