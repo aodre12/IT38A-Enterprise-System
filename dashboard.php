@@ -7,12 +7,18 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="tile">
-        <h2>Dashboard</h2>
-        <p>Welcome to your dashboard!</p>
-        <a href="profile.php" class="button">Go to Profile</a><br><br>
-        <a href="sidebar.php" class="button">Open Sidebar</a><br><br>
-        <a href="login.php" class="button">Logout</a>
+
+    <div class="sidebar">
+        <h2>Menu</h2>
+        <a href="dashboard.php">Dashboard</a>
+        <a href="profile.php">Profile</a>
+        <a href="logout.php">Logout</a>
     </div>
+
+    <div class="main-content">
+        <h1>Dashboard</h1>
+        <p>Welcome to your Dashboard.</p>
+    </div>
+
 </body>
 </html>
