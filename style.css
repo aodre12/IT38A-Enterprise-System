@@ -1,61 +1,75 @@
+
+:root {
+    --background-color: #FFF7E9;
+    --primary-color: #1E3A8A;
+    --secondary-color: #FF8552;
+    --tile-background: #B8D8F8;
+    --button-background: #003366;
+    --text-color: #333333;
+    --font-family: 'Arial', sans-serif;
+    --tile-padding: 40px;
+    --tile-radius: 12px;
+    --input-padding: 12px;
+    --button-radius: 6px;
+}
+
 * {
-    box-sizing: border-box;
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
 
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-}
-
-.container {
+    background-color: var(--background-color);
+    font-family: var(--font-family);
     display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
-.sidebar {
-    width: 250px;
-    background-color: #333;
-    color: white;
-    padding: 20px;
-}
-.sidebar h2 {
+
+.tile {
+    background-color: var(--tile-background);
+    padding: var(--tile-padding);
+    border-radius: var(--tile-radius);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
     text-align: center;
+    width: 320px;
 }
 
-.sidebar ul {
-    list-style-type: none;
-    padding: 0;
+.tile h2 {
+    color: var(--button-background);
+    margin-bottom: 20px;
 }
 
-.sidebar ul li {
-    margin: 15px 0;
-    position: relative;
+.input-field {
+    width: 90%;
+    padding: var(--input-padding);
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: var(--button-radius);
+    font-size: 16px;
 }
 
-.sidebar ul li a {
+.button {
+    background-color: var(--button-background);
     color: white;
-    text-decoration: none;
-    padding: 10px;
-    display: block;
-    transition: background 0.3s;
+    padding: 12px 24px;
+    border: none;
+    border-radius: var(--button-radius);
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 10px;
+    transition: background-color 0.3s;
 }
 
-.sidebar ul li a:hover {
-    background-color: #575757;
+.button:hover {
+    background-color: var(--primary-color);
 }
-
-.submenu {
-    display: none; /* Hide submenu by default */
-    padding-left: 20px; /* Indent submenu */
-}
-
-.sidebar ul li:hover .submenu {
-    display: block; /* Show submenu on hover */
-}
-
-.main-content {
-    flex: 1;
-    padding: 20px;
-    background-color: white;
+.sidebar a:hover {
+    background-color: var(--secondary-color);
+    color: white;
+    padding-left: 10px;
+    transition: 0.3s;
 }
