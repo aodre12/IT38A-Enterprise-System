@@ -50,6 +50,7 @@ session_start();
       border-radius: 8px;
       max-width: 400px;
       box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      margin-top: 20px;
     }
 
     .hidden {
@@ -112,6 +113,7 @@ session_start();
     <div class="dashboard-box" onclick="showWorkOrder()">Create Work Order</div>
   </div>
 
+  <!-- Work Order Form (hidden by default) -->
   <div id="work-order-form" class="work-order-form hidden">
     <h3>Create Work Order</h3>
     <form>
@@ -132,14 +134,17 @@ session_start();
   </div>
 
   <script>
+    // Toggle active class for dashboard boxes when clicked
     function toggleBox(el) {
       el.classList.toggle('active');
     }
 
+    // Show the Work Order form when clicked
     function showWorkOrder() {
       document.getElementById('work-order-form').classList.remove('hidden');
     }
 
+    // Hide the Work Order form when cancel is clicked
     function hideWorkOrder() {
       document.getElementById('work-order-form').classList.add('hidden');
     }
