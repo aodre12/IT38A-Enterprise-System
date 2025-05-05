@@ -1,10 +1,8 @@
 <?php
-// login.php
 session_start();
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Dummy credentials for example
     $valid_username = 'johndoe';
     $valid_password = 'password123';
 
@@ -12,7 +10,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'] ?? '';
 
     if ($username === $valid_username && $password === $valid_password) {
-        // On success, set session and redirect to dashboard or profile
         $_SESSION['username'] = $username;
         header('Location: dashboard.php');
         exit;
@@ -29,90 +26,107 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <title>Login</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f2f2f2;
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fef6e4;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
     }
+
     .login-container {
-      background: white;
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      width: 300px;
-    }
-    .login-container h2 {
-      margin-top: 0;
+      background: #fff;
+      width: 350px;
+      padding: 40px 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.1);
       text-align: center;
+      position: relative;
     }
-    .login-container label {
-      display: block;
-      margin-top: 15px;
-      font-weight: bold;
-    }
-    .login-container input {
+
+    .header-wave {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100px;
       width: 100%;
-      padding: 8px;
-      margin-top: 5px;
+      background: #001F54;
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+      clip-path: ellipse(100% 80% at 50% 0%);
+    }
+
+    h2 {
+      margin-top: 100px;
+      font-size: 28px;
+      font-weight: 700;
+      color: #000;
+    }
+
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      margin: 12px 0;
       border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    .login-container button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 20px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
+      border-radius: 8px;
       font-size: 16px;
     }
-    .login-container button:hover {
+
+    button {
+      width: 100%;
+      padding: 12px;
       background-color: #0056b3;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
     }
+
+    button:hover {
+      background-color: #003d80;
+    }
+
     .signup-prompt {
-      text-align: center;
       margin-top: 15px;
       font-size: 14px;
     }
+
     .signup-prompt a {
-      color: #007bff;
+      color: #0056b3;
       text-decoration: none;
       font-weight: bold;
     }
+
     .signup-prompt a:hover {
       text-decoration: underline;
     }
+
     .error {
       color: red;
-      text-align: center;
       margin-top: 10px;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
   <div class="login-container">
-    <h2>Login</h2>
+    <div class="header-wave"></div>
+    <h2>LOGIN</h2>
 
     <?php if ($error): ?>
       <div class="error"><?= htmlspecialchars($error) ?></div>
     <?php endif; ?>
 
     <form method="POST" action="">
-      <label for="username">Username</label>
-      <input type="text" id="username" name="username" required />
-
-      <label for="password">Password</label>
-      <input type="password" id="password" name="password" required />
-
-      <button type="submit">Log In</button>
+      <input type="text" name="username" placeholder="Username" required />
+      <input type="password" name="password" placeholder="Password" required />
+      <button type="submit">Login</button>
     </form>
 
     <div class="signup-prompt">
-      Don’t have an account? <a href="register.php">Sign up here</a>
+      Don’t have an account? <a href="register.php">Sign up</a>
     </div>
   </div>
 </body>
