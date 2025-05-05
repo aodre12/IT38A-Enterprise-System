@@ -226,7 +226,7 @@
   <div id="sidebar" class="sidebar">
     <h2>Dashboard</h2>
     <a href="profile.php">Profile</a>
-    <a href="work-orders.php">Work Orders</a>
+    <!-- Removed the Work Orders link -->
     <a href="tasks.php">Tasks</a>
     <a href="reports.php">Reports</a>
     <a href="settings.php">Settings</a>
