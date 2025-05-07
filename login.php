@@ -1,10 +1,8 @@
 <?php
-// login.php
 session_start();
 
-// Database connection
-$pdo = new PDO('mysql:host=localhost;dbname=your_database', 'your_username', 'your_password');
-$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+// Include the database connection configuration
+require_once 'config.php';  // Include the config file
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Fetch user credentials from the database
