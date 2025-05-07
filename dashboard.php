@@ -1,127 +1,352 @@
-<?php
-// Check if the user is logged in
-session_start();
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit();
-}
-
-// Fetch user info
-$pdo = new PDO('mysql:host=localhost;dbname=your_database', 'your_username', 'your_password');
-$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-$stmt = $pdo->prepare("SELECT * FROM users WHERE id = :user_id");
-$stmt->execute(['user_id' => $_SESSION['user_id']]);
-$user = $stmt->fetch();
-?>
-
+<?php session_start(); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-    <style>
-        /* Your original dashboard styles here */
-        /* Sidebar and layout styles as discussed earlier */
+  <meta charset="UTF-8">
+  <title>Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: row;
+      height: 100vh;
+      background-color: #f9f9f9;
+    }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            display: flex;
-            height: 100vh;
-        }
+    /* Sidebar Styles */
+    .sidebar {
+      width: 250px;
+      background-color: #001F54; 
+      color: white;
+      position: fixed;
+      height: 100%;
+      top: 0;
+      left: -250px;
+      transition: 0.3s;
+      display: flex;
+      flex-direction: column;
+      padding-top: 20px;
+    }
 
-        .main-container {
-            display: flex;
-            width: 100%;
-        }
+    .sidebar.open {
+      left: 0;
+    }
 
-        /* Sidebar for Profile */
-        .sidebar.profile-sidebar {
-            background-color: #2c3e50;
-            color: white;
-            width: 270px;
-            min-width: 60px;
-            transition: width 0.3s;
-            padding: 1rem;
-        }
+    .sidebar h2 {
+      margin: 0;
+      font-size: 24px;
+      margin-bottom: 30px;
+      text-align: center;
+    }
 
-        .sidebar .menu-item {
-            padding: 1rem;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
+    .sidebar a {
+      color: white;
+      text-decoration: none;
+      font-size: 18px;
+      margin-bottom: 15px;
+      padding-left: 20px;
+      transition: 0.3s;
+    }
 
-        .sidebar .menu-item:hover {
-            background-color: #34495e;
-        }
+    .sidebar a:hover {
+      color: #fef6e4; 
+    }
 
-        /* Content */
-        .dashboard-content {
-            flex-grow: 1;
-            padding: 2rem;
-        }
+    .hamburger-menu {
+  font-size: 30px;
+  cursor: pointer;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 9999; 
+  color: white; 
 
-    </style>
+    /* Main Content Styles */
+    .main-content {
+      margin-left: 0;
+      padding: 20px;
+      width: 100%;
+      transition: margin-left 0.3s;
+    }
+
+    .header {
+      background-color: #001F54; 
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #aaa;
+    }
+
+    .header h2 {
+      margin: 0;
+      color: white;
+    }
+
+    .header .user-icon {
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    .search-bar {
+      margin: 20px 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    .search-bar input {
+      padding: 10px;
+      border-radius: 15px;
+      border: 1px solid #ccc;
+      width: 300px;
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .card {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .card h3 {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+
+    .task-list, .work-list {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .task-list li, .work-list li {
+      margin: 5px 0;
+      padding-left: 10px;
+      border-left: 3px solid #ccc;
+    }
+
+    .checkbox {
+      margin-right: 5px;
+    }
+
+    .card button, .create-work-order button {
+      padding: 10px;
+      background-color: #001F54; 
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .card button:hover, .create-work-order button:hover {
+      background-color: #003d80; 
+    }
+
+    .create-work-order {
+      background-color: #fff;
+      border: 1px solid #ccc;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin: 20px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .create-work-order input,
+    .create-work-order textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .create-work-order button {
+      padding: 10px 15px;
+      background-color: #001F54; 
+      color: white;
+      border: none;
+      border-radius: 5px;
+      margin-right: 10px;
+      cursor: pointer;
+    }
+
+    .create-work-order button:hover {
+      background-color: #003d80; 
+    }
+
+    .cancel-btn {
+      background-color: #ccc;
+      color: black;
+    }
+
+    .cancel-btn:hover {
+      background-color: #999;
+    }
+
+    .work-orders-list {
+      display: none;
+      padding: 15px;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin-top: 20px;
+    }
+
+    .work-orders-list ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .work-orders-list li {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+    }
+  </style>
 </head>
 <body>
 
-    <div class="main-container">
+  <!-- Hamburger Menu Icon -->
+  <div class="hamburger-menu" onclick="toggleSidebar()">☰</div>
 
-        <!-- Profile Sidebar -->
-        <nav class="sidebar profile-sidebar">
-            <div class="sidebar-header">
-                <h2>Profile</h2>
-                <button class="toggle-btn" id="toggleProfileSidebarBtn">
-                    <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
-                        <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
-                    </svg>
-                </button>
-            </div>
-            <ul class="menu">
-                <li class="menu-item">
-                    <a href="view_profile.php">View Profile</a>
-                </li>
-                <li class="menu-item">
-                    <a href="account_settings.php">Account Settings</a>
-                </li>
-                <li class="menu-item">
-                    <a href="logout.php">Logout</a>
-                </li>
-            </ul>
-        </nav>
+  <!-- Sidebar -->
+  <div id="sidebar" class="sidebar">
+    <h2>Dashboard</h2>
+    <a href="profile.php">Profile</a>
+    <a href="tasks.php">Tasks</a>
+    <a href="reports.php">Reports</a>
+    <a href="settings.php">Settings</a>
+    <a href="logout.php">Logout</a>
+  </div>
 
-        <!-- Main Sidebar -->
-        <nav class="sidebar main-sidebar">
-            <ul class="menu">
-                <li class="menu-item">
-                    <a href="tasks.php">Tasks</a>
-                </li>
-                <li class="menu-item">
-                    <a href="work_orders.php">Work Orders</a>
-                </li>
-                <li class="menu-item">
-                    <a href="reports.php">Reports</a>
-                </li>
-                <li class="menu-item">
-                    <a href="settings.php">Settings</a>
-                </li>
-            </ul>
-        </nav>
+  <!-- Main Content -->
+  <div class="main-content">
 
-        <!-- Main Content -->
-        <div class="dashboard-content">
-            <h1>Welcome, <?php echo htmlspecialchars($user['username']); ?>!</h1>
-            <p>Here is your dashboard overview.</p>
-        </div>
-
+    <!-- Header -->
+    <div class="header">
+      <h2>Welcome to the Dashboard</h2>
+      <div class="user-icon">👤</div>
     </div>
 
-    <script>
-        document.getElementById('toggleProfileSidebarBtn').addEventListener('click', function() {
-            document.querySelector('.profile-sidebar').classList.toggle('collapsed');
-        });
-    </script>
+    <!-- Search Bar -->
+    <div class="search-bar">
+      <input type="text" placeholder="Search...">
+    </div>
+
+    <!-- Main Dashboard Content -->
+    <div class="content">
+      <div class="card">
+        <h3>Dashboard</h3>
+        <ul class="task-list">
+          <li>Work order overview</li>
+          <li>Assign Task</li>
+          <li>Task Status</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Work Orders</h3>
+        <ul class="work-list">
+          <li><button onclick="showWorkOrders()">Show Work Orders</button></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Pending Task</h3>
+        <ul class="task-list">
+          <li>Fix server issue</li>
+          <li>Review report</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Completed Task</h3>
+        <ul class="task-list">
+          <li><input type="checkbox" class="checkbox" checked>Backup done</li>
+          <li><input type="checkbox" class="checkbox" checked>System updated</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Create Work Orders</h3>
+        <button onclick="showWorkOrder()">➕ New Order</button>
+      </div>
+
+      <div class="card" style="grid-column: 1 / -1;">
+        <h3>Reports</h3>
+        <p>No reports available.</p>
+      </div>
+    </div>
+
+    <!-- Work Order Form (hidden initially) -->
+    <div id="create-work-order" class="create-work-order hidden">
+      <h3>Create New Work Order</h3>
+      <form>
+        <label>
+          Title:
+          <input type="text" placeholder="Enter title" required>
+        </label><br>
+        <label>
+          Description:
+          <textarea placeholder="Describe the task" required></textarea>
+        </label><br>
+        <label>
+          Due Date:
+          <input type="date" required>
+        </label><br>
+        <button type="submit">Submit</button>
+        <button type="button" class="cancel-btn" onclick="hideWorkOrder()">Cancel</button>
+      </form>
+    </div>
+
+    <!-- Work Orders List (hidden initially) -->
+    <div id="work-orders-list" class="work-orders-list">
+      <h3>Work Orders List</h3>
+      <ul>
+        <li>Work Order #1: Fix server issue</li>
+        <li>Work Order #2: Update software</li>
+        <li>Work Order #3: Backup system</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const mainContent = document.querySelector('.main-content');
+      sidebar.classList.toggle('open');
+      mainContent.style.marginLeft = sidebar.classList.contains('open') ? '250px' : '0';
+    }
+
+    function showWorkOrder() {
+      document.getElementById('create-work-order').classList.remove('hidden');
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+
+    function hideWorkOrder() {
+      document.getElementById('create-work-order').classList.add('hidden');
+    }
+
+    // Function to show work orders
+    function showWorkOrders() {
+      const workOrdersList = document.getElementById('work-orders-list');
+      workOrdersList.classList.toggle('hidden');
+    }
+  </script>
 
 </body>
 </html>
