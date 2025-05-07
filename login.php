@@ -1,20 +1,29 @@
 <?php
+// Start session at the top of the page
 session_start();
-$error = '';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $valid_username = 'johndoe';
-    $valid_password = 'password123';
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Assuming you have a form input for username and password
+    $username = $_POST['username'];
+    $password = $_POST['password'];
 
-    $username = $_POST['username'] ?? '';
-    $password = $_POST['password'] ?? '';
+    // Your database connection (adjust according to your DB credentials)
+    $pdo = new PDO('mysql:host=localhost;dbname=your_database', 'your_username', 'your_password');
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    if ($username === $valid_username && $password === $valid_password) {
-        $_SESSION['username'] = $username;
-        header('Location: dashboard.php');
-        exit;
+    // Prepare and execute the query to check credentials
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE username = :username AND password = :password");
+    $stmt->execute(['username' => $username, 'password' => md5($password)]); // Assuming passwords are hashed
+    $user = $stmt->fetch();
+
+    if ($user) {
+        // If user is found, set session and redirect to dashboard
+        $_SESSION['user_id'] = $user['id']; // Store user id in session
+        header("Location: dashboard.php");
+        exit();
     } else {
-        $error = 'Invalid username or password.';
+        // Show an error message if login fails
+        $error_message = "Invalid username or password.";
     }
 }
 ?>
@@ -22,112 +31,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Login</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #fef6e4;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-
-    .login-container {
-      background: #fff;
-      width: 350px;
-      padding: 40px 30px;
-      border-radius: 20px;
-      box-shadow: 0 0 12px rgba(0,0,0,0.1);
-      text-align: center;
-      position: relative;
-    }
-
-    .header-wave {
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: 100px;
-      width: 100%;
-      background: #001F54;
-      border-top-left-radius: 20px;
-      border-top-right-radius: 20px;
-      clip-path: ellipse(100% 80% at 50% 0%);
-    }
-
-    h2 {
-      margin-top: 100px;
-      font-size: 28px;
-      font-weight: 700;
-      color: #000;
-    }
-
-    input[type="text"], input[type="password"] {
-      width: 100%;
-      padding: 12px;
-      margin: 12px 0;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 16px;
-    }
-
-    button {
-      width: 100%;
-      padding: 12px;
-      background-color: #0056b3;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #003d80;
-    }
-
-    .signup-prompt {
-      margin-top: 15px;
-      font-size: 14px;
-    }
-
-    .signup-prompt a {
-      color: #0056b3;
-      text-decoration: none;
-      font-weight: bold;
-    }
-
-    .signup-prompt a:hover {
-      text-decoration: underline;
-    }
-
-    .error {
-      color: red;
-      margin-top: 10px;
-      font-size: 14px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
 </head>
 <body>
-  <div class="login-container">
-    <div class="header-wave"></div>
-    <h2>LOGIN</h2>
-
-    <?php if ($error): ?>
-      <div class="error"><?= htmlspecialchars($error) ?></div>
+    <?php if (isset($error_message)): ?>
+        <p style="color: red;"><?php echo $error_message; ?></p>
     <?php endif; ?>
 
-    <form method="POST" action="">
-      <input type="text" name="username" placeholder="Username" required />
-      <input type="password" name="password" placeholder="Password" required />
-      <button type="submit">Login</button>
+    <form method="POST" action="login.php">
+        <label for="username">Username:</label>
+        <input type="text" name="username" id="username" required><br><br>
+        <label for="password">Password:</label>
+        <input type="password" name="password" id="password" required><br><br>
+        <button type="submit">Login</button>
     </form>
-
-    <div class="signup-prompt">
-      Don’t have an account? <a href="register.php">Sign up</a>
-    </div>
-  </div>
 </body>
 </html>

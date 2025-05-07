@@ -1,426 +1,277 @@
-<?php session_start(); ?>
+<?php
+// Start a session or check if the user is logged in
+session_start();
+
+// Check if the user is logged in (you can modify this as per your authentication logic)
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php"); // Redirect to login if not authenticated
+    exit();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Dashboard</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: row;
-      height: 100vh;
-      background-color: #f9f9f9;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Dashboard</title>
+    <style>
+        /* Reset and base */
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
 
-    /* Sidebar Styles */
-    .sidebar {
-      width: 250px;
-      background-color: #007bff;
-      color: white;
-      position: fixed;
-      height: 100%;
-      top: 0;
-      left: -250px;
-      transition: 0.3s;
-      display: flex;
-      flex-direction: column;
-      padding-top: 20px;
-    }
+        /* Sidebar container */
+        .sidebar {
+            background: #2c3e50;
+            color: #ecf0f1;
+            width: 270px;
+            min-width: 60px; /* Collapsed width */
+            transition: width 0.3s ease;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
 
-    .sidebar.open {
-      left: 0;
-    }
+        /* Collapsed state */
+        .sidebar.collapsed {
+            width: 60px;
+        }
 
-    .sidebar h2 {
-      margin: 0;
-      font-size: 24px;
-      margin-bottom: 30px;
-      text-align: center;
-    }
+        /* Sidebar header with toggle button */
+        .sidebar-header {
+            padding: 1.3rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #1a252f;
+            user-select: none;
+        }
 
-    .sidebar a {
-      color: white;
-      text-decoration: none;
-      font-size: 18px;
-      margin-bottom: 15px;
-      padding-left: 20px;
-      transition: 0.3s;
-    }
+        .sidebar-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0;
+            white-space: nowrap;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+        .sidebar.collapsed .sidebar-header h2 {
+            opacity: 0;
+        }
 
-    .sidebar a:hover {
-      color: #ddd;
-    }
+        /* Toggle button */
+        .toggle-btn {
+            width: 32px;
+            height: 32px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            outline-offset: 4px;
+            color: #ecf0f1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+        }
+        .sidebar.collapsed .toggle-btn {
+            transform: rotate(180deg);
+        }
+        .toggle-btn svg {
+            width: 20px;
+            height: 20px;
+        }
 
-    .hamburger-menu {
-      font-size: 30px;
-      cursor: pointer;
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      z-index: 1000;
-      color: black;
-    }
+        /* Menu list */
+        .menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
 
-    /* Main Content Styles */
-    .main-content {
-      margin-left: 0;
-      padding: 20px;
-      width: 100%;
-      transition: margin-left 0.3s;
-    }
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.6rem;
+            font-size: 1rem;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background-color 0.2s ease;
+        }
+        .menu-item:hover,
+        .menu-item:focus {
+            background: #34495e;
+        }
+        .menu-item:focus {
+            outline: 2px solid #2980b9;
+            outline-offset: -2px;
+        }
 
-    .header {
-      background-color: #007bff;
-      padding: 10px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid #aaa;
-    }
+        /* Icons placeholders - using inline SVG for each item */
+        .menu-item svg {
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            fill: #bdc3c7;
+            margin-right: 15px;
+            transition: fill 0.3s ease;
+        }
+        .sidebar.collapsed .menu-item svg {
+            margin: 0 auto;
+        }
 
-    .header h2 {
-      margin: 0;
-      color: white;
-    }
+        /* Hide text when collapsed */
+        .sidebar.collapsed .menu-item span.text {
+            display: none;
+        }
 
-    .header .user-icon {
-      font-size: 24px;
-      cursor: pointer;
-    }
+        /* Scrollbar styling for menu */
+        .menu::-webkit-scrollbar {
+            width: 6px;
+        }
+        .menu::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .menu::-webkit-scrollbar-thumb {
+            background-color: rgba(255,255,255,0.15);
+            border-radius: 3px;
+        }
 
-    .search-bar {
-      margin: 20px 0;
-      display: flex;
-      justify-content: center;
-    }
+        /* Footer with logout */
+        .sidebar-footer {
+            padding: 1rem 1.6rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
 
-    .search-bar input {
-      padding: 10px;
-      border-radius: 15px;
-      border: 1px solid #ccc;
-      width: 300px;
-    }
+        .sidebar-footer .menu-item {
+            padding: 1rem 0;
+            margin: 0;
+            border: none;
+            cursor: pointer;
+            color: #e74c3c;
+        }
+        .sidebar-footer .menu-item:hover,
+        .sidebar-footer .menu-item:focus {
+            background: rgba(231, 76, 60, 0.15);
+            color: #e74c3c;
+        }
 
-    .content {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 20px;
-      padding: 20px;
-    }
-
-    .card {
-      background-color: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-
-    .card h3 {
-      margin-top: 0;
-      margin-bottom: 10px;
-    }
-
-    .task-list, .work-list {
-      list-style: none;
-      padding-left: 0;
-    }
-
-    .task-list li, .work-list li {
-      margin: 5px 0;
-      padding-left: 10px;
-      border-left: 3px solid #ccc;
-    }
-
-    .checkbox {
-      margin-right: 5px;
-    }
-
-    .card button {
-      padding: 10px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      width: 100%;
-      margin-top: 10px;
-    }
-
-    .card button:hover {
-      background-color: #0056b3;
-    }
-
-    .create-work-order {
-      background-color: #fff;
-      border: 1px solid #ccc;
-      padding: 25px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      margin: 20px;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    .create-work-order input,
-    .create-work-order textarea {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-
-    .create-work-order button {
-      padding: 10px 15px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      margin-right: 10px;
-      cursor: pointer;
-    }
-
-    .create-work-order button:hover {
-      background-color: #0056b3;
-    }
-
-    .cancel-btn {
-      background-color: #ccc;
-      color: black;
-    }
-
-    .cancel-btn:hover {
-      background-color: #999;
-    }
-
-    .work-orders-list {
-      display: none;
-      padding: 15px;
-      background-color: white;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      margin-top: 20px;
-    }
-
-    .work-orders-list ul {
-      list-style: none;
-      padding-left: 0;
-    }
-
-    .work-orders-list li {
-      padding: 10px;
-      border-bottom: 1px solid #eee;
-    }
-
-    /* Profile Sidebar Toggle */
-    .profile-toggle {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      font-size: 24px;
-      background-color: #001f54;
-      color: white;
-      padding: 5px 10px;
-      border-radius: 5px;
-      cursor: pointer;
-      z-index: 1100;
-    }
-
-    .profile-sidebar {
-      position: fixed;
-      top: 0;
-      right: -250px;
-      width: 250px;
-      height: 100%;
-      background-color: #fef6e4;
-      box-shadow: -2px 0 5px rgba(0,0,0,0.2);
-      padding: 20px;
-      transition: right 0.3s ease;
-      z-index: 1050;
-    }
-
-    .profile-sidebar.open {
-      right: 0;
-    }
-
-    .profile-sidebar .close-btn {
-      position: absolute;
-      left: 10px;
-      top: 10px;
-      cursor: pointer;
-      font-size: 18px;
-      background-color: #001f54;
-      color: white;
-      padding: 4px 8px;
-      border-radius: 5px;
-    }
-
-    .profile-sidebar h3 {
-      margin-top: 40px;
-      font-size: 20px;
-    }
-
-    .profile-sidebar ul {
-      list-style: none;
-      padding: 0;
-      margin-top: 20px;
-    }
-
-    .profile-sidebar ul li {
-      margin: 10px 0;
-    }
-
-    .profile-sidebar ul li a {
-      text-decoration: none;
-      color: #001f54;
-      font-weight: bold;
-    }
-  </style>
+        /* Responsive for small height screen: ensure no vertical scrolling inside the sidebar */
+        @media (max-height: 600px) {
+            .sidebar {
+                height: 100vh;
+            }
+            body {
+                align-items: stretch;
+            }
+        }
+    </style>
 </head>
 <body>
 
-  <!-- Hamburger Menu Icon -->
-  <div class="hamburger-menu" onclick="toggleSidebar()">☰</div>
-
-  <!-- Sidebar -->
-  <div id="sidebar" class="sidebar">
-    <h2>Dashboard</h2>
-    <a href="profile.php">Profile</a>
-    <a href="tasks.php">Tasks</a>
-    <a href="reports.php">Reports</a>
-    <a href="settings.php">Settings</a>
-    <a href="logout.php">Logout</a>
-  </div>
-
-  <!-- Profile Sidebar Toggle -->
-  <div class="profile-toggle" onclick="toggleProfileSidebar()">→</div>
-
-  <!-- Profile Sidebar -->
-  <div id="profile-sidebar" class="profile-sidebar">
-    <div class="close-btn" onclick="toggleProfileSidebar()">←</div>
-    <h3>My Profile</h3>
-    <ul>
-      <li><a href="#">View Profile</a></li>
-      <li><a href="#">Account Settings</a></li>
-      <li><a href="dashboard.php">Back to Dashboard</a></li>
+<!-- Sidebar navigation -->
+<nav class="sidebar" aria-label="Profile sidebar">
+    <div class="sidebar-header">
+        <h2>Profile</h2>
+        <button class="toggle-btn" aria-label="Toggle sidebar" aria-expanded="true" id="toggleSidebarBtn" aria-controls="sidebarMenu">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="currentColor">
+                <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
+            </svg>
+        </button>
+    </div>
+    <ul class="menu" id="sidebarMenu" role="menu" tabindex="0">
+        <li class="menu-item" role="menuitem" tabindex="0" aria-label="View Profile">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <circle cx="12" cy="8" r="4" />
+                <path d="M4 20c0-4 8-4 8-4s8 0 8 4v1H4v-1z"/>
+            </svg>
+            <span class="text">View Profile</span>
+        </li>
+        <li class="menu-item" role="menuitem" tabindex="0" aria-label="Account Settings">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0-6a2 2 0 1 1 0 4 2 2 0 0 1 0-4zM4.22 19H19.8l-2.25-6H6.5l-2.28 6z"/>
+                <circle cx="12" cy="12" r="10" fill="none"/>
+            </svg>
+            <span class="text">Account Settings</span>
+        </li>
+        <li class="menu-item" role="menuitem" tabindex="0" aria-label="My Orders">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M3 6h18v2H3V6zm0 6h10v2H3v-2zm0 6h6v2H3v-2z"/>
+                <rect x="15" y="6" width="6" height="12" rx="1"/>
+            </svg>
+            <span class="text">My Orders</span>
+        </li>
+        <li class="menu-item" role="menuitem" tabindex="0" aria-label="Notifications">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M12 22a2 2 0 0 0 2-2H10a2 2 0 0 0 2 2zm6-6V11c0-3.07-1.64-5.64-5-6.32V4a1 1 0 1 0-2 0v.68C7.64 5.36 6 7.92 6 11v5l-1 1v1h14v-1l-1-1z"/>
+            </svg>
+            <span class="text">Notifications</span>
+        </li>
+        <li class="menu-item" role="menuitem" tabindex="0" aria-label="Saved Reports">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M6 2h9l5 5v15a1 1 0 0 1-1 1H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zM14 3v4h4"/>
+                <rect x="8" y="11" width="8" height="2"/>
+                <rect x="8" y="15" width="5" height="2"/>
+            </svg>
+            <span class="text">Saved Reports</span>
+        </li>
+        <li class="menu-item" role="menuitem" tabindex="0" aria-label="Settings">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M19.14 12.94a1.94 1.94 0 0 0 0-1.88l2.03-1.57-2-3.46-2.58.98a6.68 6.68 0 0 0-1.6-.93L14.5 3h-5l-.49 3.08a6.68 6.68 0 0 0-1.6.93l-2.58-.98-2 3.46 2.03 1.57a1.94 1.94 0 0 0 0 1.88L3.44 14.5l2 3.46 2.58-.98c.48.34 1 .6 1.6.93L9.5 21h5l.49-3.08c.6-.33 1.12-.59 1.6-.93l2.58.98 2-3.46-2.03-1.58zM12 15a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+            </svg>
+            <span class="text">Settings</span>
+        </li>
     </ul>
-  </div>
-
-  <!-- Main Content -->
-  <div class="main-content">
-
-    <!-- Header -->
-    <div class="header">
-      <h2>Welcome to the Dashboard</h2>
-      <div class="user-icon">👤</div>
+    <div class="sidebar-footer">
+        <button class="menu-item" aria-label="Logout" tabindex="0" role="menuitem">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="currentColor" style="fill:#e74c3c;">
+                <path d="M16 13v-2H7V8l-5 4 5 4v-3zM20 3H8a2 2 0 0 0-2 2v5h2V5h12v14H8v-5H6v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z"/>
+            </svg>
+            <span class="text">Logout</span>
+        </button>
     </div>
+</nav>
 
-    <!-- Search Bar -->
-    <div class="search-bar">
-      <input type="text" placeholder="Search...">
-    </div>
+<!-- Dashboard content -->
+<div class="dashboard-content" style="flex-grow: 1; padding: 20px;">
+    <!-- Your existing dashboard content here -->
+    <h1>Welcome to Your Dashboard</h1>
+    <p>Dashboard content goes here.</p>
+</div>
 
-    <!-- Main Dashboard Content -->
-    <div class="content">
-      <div class="card">
-        <h3>Dashboard</h3>
-        <ul class="task-list">
-          <li>Work order overview</li>
-          <li>Assign Task</li>
-          <li>Task Status</li>
-        </ul>
-      </div>
+<script>
+  (function () {
+    const sidebar = document.querySelector('.sidebar');
+    const toggleBtn = document.getElementById('toggleSidebarBtn');
+    const menu = document.getElementById('sidebarMenu');
 
-      <div class="card">
-        <h3>Work Orders</h3>
-        <ul class="work-list">
-          <li><button onclick="showWorkOrders()">Show Work Orders</button></li>
-        </ul>
-      </div>
+    toggleBtn.addEventListener('click', () => {
+      const isCollapsed = sidebar.classList.toggle('collapsed');
+      toggleBtn.setAttribute('aria-expanded', !isCollapsed);
+    });
 
-      <div class="card">
-        <h3>Pending Task</h3>
-        <ul class="task-list">
-          <li>Fix server issue</li>
-          <li>Review report</li>
-        </ul>
-      </div>
-
-      <div class="card">
-        <h3>Completed Task</h3>
-        <ul class="task-list">
-          <li><input type="checkbox" class="checkbox" checked>Backup done</li>
-          <li><input type="checkbox" class="checkbox" checked>System updated</li>
-        </ul>
-      </div>
-
-      <div class="card">
-        <h3>Create Work Orders</h3>
-        <button onclick="showWorkOrder()">➕ New Order</button>
-      </div>
-
-      <div class="card" style="grid-column: 1 / -1;">
-        <h3>Reports</h3>
-        <p>No reports available.</p>
-      </div>
-    </div>
-
-    <!-- Work Order Form -->
-    <div id="create-work-order" class="create-work-order hidden">
-      <h3>Create New Work Order</h3>
-      <form>
-        <label>Title:<input type="text" placeholder="Enter title" required></label><br>
-        <label>Description:<textarea placeholder="Describe the task" required></textarea></label><br>
-        <label>Due Date:<input type="date" required></label><br>
-        <button type="submit">Submit</button>
-        <button type="button" class="cancel-btn" onclick="hideWorkOrder()">Cancel</button>
-      </form>
-    </div>
-
-    <!-- Work Orders List -->
-    <div id="work-orders-list" class="work-orders-list">
-      <h3>Work Orders List</h3>
-      <ul>
-        <li>Work Order #1: Fix server issue</li>
-        <li>Work Order #2: Update software</li>
-        <li>Work Order #3: Backup system</li>
-      </ul>
-    </div>
-
-  </div>
-
-  <script>
-    function toggleSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      const mainContent = document.querySelector('.main-content');
-      sidebar.classList.toggle('open');
-      mainContent.style.marginLeft = sidebar.classList.contains('open') ? '250px' : '0';
-    }
-
-    function showWorkOrder() {
-      document.getElementById('create-work-order').classList.remove('hidden');
-      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-    }
-
-    function hideWorkOrder() {
-      document.getElementById('create-work-order').classList.add('hidden');
-    }
-
-    function showWorkOrders() {
-      const workOrdersList = document.getElementById('work-orders-list');
-      workOrdersList.classList.toggle('hidden');
-    }
-
-    function toggleProfileSidebar() {
-      const sidebar = document.getElementById('profile-sidebar');
-      sidebar.classList.toggle('open');
-    }
-  </script>
-
+    // Keyboard accessibility: space or enter triggers click on menu items
+    const menuItems = sidebar.querySelectorAll('.menu-item');
+    menuItems.forEach(item => {
+      item.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          item.click();
+        }
+      });
+    });
+  })();
+</script>
 </body>
 </html>
