@@ -15,19 +15,10 @@
       background-color: #f9f9f9;
     }
 
-    .hamburger-menu {
-      font-size: 30px;
-      cursor: pointer;
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      z-index: 1000;
-      color: black;
-    }
-
+    /* Sidebar Styles */
     .sidebar {
       width: 250px;
-      background-color: #172a3a;
+      background-color: #007bff;
       color: white;
       position: fixed;
       height: 100%;
@@ -37,7 +28,6 @@
       display: flex;
       flex-direction: column;
       padding-top: 20px;
-      z-index: 999;
     }
 
     .sidebar.open {
@@ -61,9 +51,57 @@
     }
 
     .sidebar a:hover {
-      color: #ffb703;
+      color: #ddd;
     }
 
+    .hamburger-menu {
+      font-size: 30px;
+      cursor: pointer;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1000;
+      color: black;
+    }
+
+    /* Profile Sidebar (Right) */
+    .profile-sidebar {
+      width: 250px;
+      background-color: #003049;
+      color: white;
+      position: fixed;
+      height: 100%;
+      top: 0;
+      right: -250px;
+      transition: 0.3s;
+      padding-top: 20px;
+      z-index: 1001;
+    }
+
+    .profile-sidebar.open {
+      right: 0;
+    }
+
+    .profile-sidebar h2 {
+      text-align: center;
+      font-size: 22px;
+      margin-bottom: 20px;
+    }
+
+    .profile-sidebar a {
+      display: block;
+      color: white;
+      text-decoration: none;
+      font-size: 16px;
+      padding: 10px 20px;
+      transition: 0.2s;
+    }
+
+    .profile-sidebar a:hover {
+      background-color: #1d3557;
+    }
+
+    /* Main Content Styles */
     .main-content {
       margin-left: 0;
       padding: 20px;
@@ -72,7 +110,7 @@
     }
 
     .header {
-      background-color: #172a3a;
+      background-color: #007bff;
       padding: 10px 20px;
       display: flex;
       align-items: center;
@@ -85,10 +123,9 @@
       color: white;
     }
 
-    .user-icon {
+    .header .user-icon {
       font-size: 24px;
       cursor: pointer;
-      color: white;
     }
 
     .search-bar {
@@ -140,7 +177,7 @@
 
     .card button {
       padding: 10px;
-      background-color: #006d77;
+      background-color: #007bff;
       color: white;
       border: none;
       border-radius: 5px;
@@ -150,7 +187,7 @@
     }
 
     .card button:hover {
-      background-color: #004f56;
+      background-color: #0056b3;
     }
 
     .create-work-order {
@@ -177,7 +214,7 @@
 
     .create-work-order button {
       padding: 10px 15px;
-      background-color: #006d77;
+      background-color: #007bff;
       color: white;
       border: none;
       border-radius: 5px;
@@ -186,7 +223,7 @@
     }
 
     .create-work-order button:hover {
-      background-color: #004f56;
+      background-color: #0056b3;
     }
 
     .cancel-btn {
@@ -216,41 +253,6 @@
       padding: 10px;
       border-bottom: 1px solid #eee;
     }
-
-    /* Profile Sidebar */
-    .profile-sidebar {
-      position: fixed;
-      right: -250px;
-      top: 0;
-      width: 250px;
-      height: 100%;
-      background-color: #003049;
-      color: white;
-      padding: 20px;
-      box-shadow: -2px 0 10px rgba(0,0,0,0.2);
-      transition: right 0.3s ease-in-out;
-      z-index: 998;
-    }
-
-    .profile-sidebar.open {
-      right: 0;
-    }
-
-    .profile-sidebar h3 {
-      margin-top: 0;
-      margin-bottom: 20px;
-    }
-
-    .profile-sidebar a {
-      display: block;
-      color: #ffb703;
-      text-decoration: none;
-      margin-bottom: 10px;
-    }
-
-    .profile-sidebar a:hover {
-      text-decoration: underline;
-    }
   </style>
 </head>
 <body>
@@ -267,12 +269,13 @@
     <a href="logout.php">Logout</a>
   </div>
 
-  <!-- Profile Sidebar -->
+  <!-- Profile Sidebar (Right) -->
   <div id="profileSidebar" class="profile-sidebar">
-    <h3>Profile Settings</h3>
-    <a href="edit_profile.php">Edit Profile</a>
-    <a href="change_password.php">Change Password</a>
-    <a href="activity_logs.php">Activity Logs</a>
+    <h2>My Profile</h2>
+    <a href="#">Edit Profile</a>
+    <a href="#">Account Settings</a>
+    <a href="#">Notifications</a>
+    <a href="#" onclick="toggleProfileSidebar()">Back to Dashboard</a>
   </div>
 
   <!-- Main Content -->
@@ -280,7 +283,7 @@
 
     <!-- Header -->
     <div class="header">
-      <h2>Welcome to UtiliTrack</h2>
+      <h2>Welcome to Utilitrack</h2>
       <div class="user-icon" onclick="toggleProfileSidebar()">👤</div>
     </div>
 
@@ -289,7 +292,7 @@
       <input type="text" placeholder="Search...">
     </div>
 
-    <!-- Dashboard Content -->
+    <!-- Main Dashboard Content -->
     <div class="content">
       <div class="card">
         <h3>Dashboard</h3>
@@ -361,7 +364,6 @@
         <li>Work Order #3: Backup system</li>
       </ul>
     </div>
-
   </div>
 
   <script>
@@ -370,11 +372,6 @@
       const mainContent = document.querySelector('.main-content');
       sidebar.classList.toggle('open');
       mainContent.style.marginLeft = sidebar.classList.contains('open') ? '250px' : '0';
-    }
-
-    function toggleProfileSidebar() {
-      const profileSidebar = document.getElementById('profileSidebar');
-      profileSidebar.classList.toggle('open');
     }
 
     function showWorkOrder() {
@@ -390,7 +387,11 @@
       const workOrdersList = document.getElementById('work-orders-list');
       workOrdersList.classList.toggle('hidden');
     }
-  </script>
 
+    function toggleProfileSidebar() {
+      const profileSidebar = document.getElementById('profileSidebar');
+      profileSidebar.classList.toggle('open');
+    }
+  </script>
 </body>
 </html>
