@@ -15,10 +15,19 @@
       background-color: #f9f9f9;
     }
 
-    /* Sidebar Styles */
+    .hamburger-menu {
+      font-size: 30px;
+      cursor: pointer;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1000;
+      color: black;
+    }
+
     .sidebar {
       width: 250px;
-      background-color: #001F54; 
+      background-color: #172a3a;
       color: white;
       position: fixed;
       height: 100%;
@@ -28,6 +37,7 @@
       display: flex;
       flex-direction: column;
       padding-top: 20px;
+      z-index: 999;
     }
 
     .sidebar.open {
@@ -51,19 +61,9 @@
     }
 
     .sidebar a:hover {
-      color: #fef6e4; 
+      color: #ffb703;
     }
 
-    .hamburger-menu {
-  font-size: 30px;
-  cursor: pointer;
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  z-index: 9999; 
-  color: white; 
-
-    /* Main Content Styles */
     .main-content {
       margin-left: 0;
       padding: 20px;
@@ -72,7 +72,7 @@
     }
 
     .header {
-      background-color: #001F54; 
+      background-color: #172a3a;
       padding: 10px 20px;
       display: flex;
       align-items: center;
@@ -85,9 +85,10 @@
       color: white;
     }
 
-    .header .user-icon {
+    .user-icon {
       font-size: 24px;
       cursor: pointer;
+      color: white;
     }
 
     .search-bar {
@@ -137,9 +138,9 @@
       margin-right: 5px;
     }
 
-    .card button, .create-work-order button {
+    .card button {
       padding: 10px;
-      background-color: #001F54; 
+      background-color: #006d77;
       color: white;
       border: none;
       border-radius: 5px;
@@ -148,8 +149,8 @@
       margin-top: 10px;
     }
 
-    .card button:hover, .create-work-order button:hover {
-      background-color: #003d80; 
+    .card button:hover {
+      background-color: #004f56;
     }
 
     .create-work-order {
@@ -176,7 +177,7 @@
 
     .create-work-order button {
       padding: 10px 15px;
-      background-color: #001F54; 
+      background-color: #006d77;
       color: white;
       border: none;
       border-radius: 5px;
@@ -185,7 +186,7 @@
     }
 
     .create-work-order button:hover {
-      background-color: #003d80; 
+      background-color: #004f56;
     }
 
     .cancel-btn {
@@ -215,6 +216,41 @@
       padding: 10px;
       border-bottom: 1px solid #eee;
     }
+
+    /* Profile Sidebar */
+    .profile-sidebar {
+      position: fixed;
+      right: -250px;
+      top: 0;
+      width: 250px;
+      height: 100%;
+      background-color: #003049;
+      color: white;
+      padding: 20px;
+      box-shadow: -2px 0 10px rgba(0,0,0,0.2);
+      transition: right 0.3s ease-in-out;
+      z-index: 998;
+    }
+
+    .profile-sidebar.open {
+      right: 0;
+    }
+
+    .profile-sidebar h3 {
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+
+    .profile-sidebar a {
+      display: block;
+      color: #ffb703;
+      text-decoration: none;
+      margin-bottom: 10px;
+    }
+
+    .profile-sidebar a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
@@ -232,13 +268,21 @@
     <a href="logout.php">Logout</a>
   </div>
 
+  <!-- Profile Sidebar -->
+  <div id="profileSidebar" class="profile-sidebar">
+    <h3>Profile Settings</h3>
+    <a href="edit_profile.php">Edit Profile</a>
+    <a href="change_password.php">Change Password</a>
+    <a href="activity_logs.php">Activity Logs</a>
+  </div>
+
   <!-- Main Content -->
   <div class="main-content">
 
     <!-- Header -->
     <div class="header">
-      <h2>Welcome to the Dashboard</h2>
-      <div class="user-icon">👤</div>
+      <h2>Welcome to UtiliTrack</h2>
+      <div class="user-icon" onclick="toggleProfileSidebar()">👤</div>
     </div>
 
     <!-- Search Bar -->
@@ -246,7 +290,7 @@
       <input type="text" placeholder="Search...">
     </div>
 
-    <!-- Main Dashboard Content -->
+    <!-- Dashboard Content -->
     <div class="content">
       <div class="card">
         <h3>Dashboard</h3>
@@ -291,20 +335,17 @@
       </div>
     </div>
 
-    <!-- Work Order Form (hidden initially) -->
+    <!-- Work Order Form -->
     <div id="create-work-order" class="create-work-order hidden">
       <h3>Create New Work Order</h3>
       <form>
-        <label>
-          Title:
+        <label>Title:
           <input type="text" placeholder="Enter title" required>
         </label><br>
-        <label>
-          Description:
+        <label>Description:
           <textarea placeholder="Describe the task" required></textarea>
         </label><br>
-        <label>
-          Due Date:
+        <label>Due Date:
           <input type="date" required>
         </label><br>
         <button type="submit">Submit</button>
@@ -312,7 +353,7 @@
       </form>
     </div>
 
-    <!-- Work Orders List (hidden initially) -->
+    <!-- Work Orders List -->
     <div id="work-orders-list" class="work-orders-list">
       <h3>Work Orders List</h3>
       <ul>
@@ -332,6 +373,11 @@
       mainContent.style.marginLeft = sidebar.classList.contains('open') ? '250px' : '0';
     }
 
+    function toggleProfileSidebar() {
+      const profileSidebar = document.getElementById('profileSidebar');
+      profileSidebar.classList.toggle('open');
+    }
+
     function showWorkOrder() {
       document.getElementById('create-work-order').classList.remove('hidden');
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
@@ -341,7 +387,6 @@
       document.getElementById('create-work-order').classList.add('hidden');
     }
 
-    // Function to show work orders
     function showWorkOrders() {
       const workOrdersList = document.getElementById('work-orders-list');
       workOrdersList.classList.toggle('hidden');
