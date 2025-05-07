@@ -64,43 +64,6 @@
       color: black;
     }
 
-    /* Profile Sidebar (Right) */
-    .profile-sidebar {
-      width: 250px;
-      background-color: #003049;
-      color: white;
-      position: fixed;
-      height: 100%;
-      top: 0;
-      right: -250px;
-      transition: 0.3s;
-      padding-top: 20px;
-      z-index: 1001;
-    }
-
-    .profile-sidebar.open {
-      right: 0;
-    }
-
-    .profile-sidebar h2 {
-      text-align: center;
-      font-size: 22px;
-      margin-bottom: 20px;
-    }
-
-    .profile-sidebar a {
-      display: block;
-      color: white;
-      text-decoration: none;
-      font-size: 16px;
-      padding: 10px 20px;
-      transition: 0.2s;
-    }
-
-    .profile-sidebar a:hover {
-      background-color: #1d3557;
-    }
-
     /* Main Content Styles */
     .main-content {
       margin-left: 0;
@@ -253,6 +216,70 @@
       padding: 10px;
       border-bottom: 1px solid #eee;
     }
+
+    /* Profile Sidebar Toggle */
+    .profile-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      font-size: 24px;
+      background-color: #001f54;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      z-index: 1100;
+    }
+
+    .profile-sidebar {
+      position: fixed;
+      top: 0;
+      right: -250px;
+      width: 250px;
+      height: 100%;
+      background-color: #fef6e4;
+      box-shadow: -2px 0 5px rgba(0,0,0,0.2);
+      padding: 20px;
+      transition: right 0.3s ease;
+      z-index: 1050;
+    }
+
+    .profile-sidebar.open {
+      right: 0;
+    }
+
+    .profile-sidebar .close-btn {
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      cursor: pointer;
+      font-size: 18px;
+      background-color: #001f54;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 5px;
+    }
+
+    .profile-sidebar h3 {
+      margin-top: 40px;
+      font-size: 20px;
+    }
+
+    .profile-sidebar ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 20px;
+    }
+
+    .profile-sidebar ul li {
+      margin: 10px 0;
+    }
+
+    .profile-sidebar ul li a {
+      text-decoration: none;
+      color: #001f54;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
@@ -263,19 +290,25 @@
   <!-- Sidebar -->
   <div id="sidebar" class="sidebar">
     <h2>Dashboard</h2>
+    <a href="profile.php">Profile</a>
     <a href="tasks.php">Tasks</a>
     <a href="reports.php">Reports</a>
     <a href="settings.php">Settings</a>
     <a href="logout.php">Logout</a>
   </div>
 
-  <!-- Profile Sidebar (Right) -->
-  <div id="profileSidebar" class="profile-sidebar">
-    <h2>My Profile</h2>
-    <a href="#">Edit Profile</a>
-    <a href="#">Account Settings</a>
-    <a href="#">Notifications</a>
-    <a href="#" onclick="toggleProfileSidebar()">Back to Dashboard</a>
+  <!-- Profile Sidebar Toggle -->
+  <div class="profile-toggle" onclick="toggleProfileSidebar()">→</div>
+
+  <!-- Profile Sidebar -->
+  <div id="profile-sidebar" class="profile-sidebar">
+    <div class="close-btn" onclick="toggleProfileSidebar()">←</div>
+    <h3>My Profile</h3>
+    <ul>
+      <li><a href="#">View Profile</a></li>
+      <li><a href="#">Account Settings</a></li>
+      <li><a href="dashboard.php">Back to Dashboard</a></li>
+    </ul>
   </div>
 
   <!-- Main Content -->
@@ -283,8 +316,8 @@
 
     <!-- Header -->
     <div class="header">
-      <h2>Welcome to Utilitrack</h2>
-      <div class="user-icon" onclick="toggleProfileSidebar()">👤</div>
+      <h2>Welcome to the Dashboard</h2>
+      <div class="user-icon">👤</div>
     </div>
 
     <!-- Search Bar -->
@@ -341,15 +374,9 @@
     <div id="create-work-order" class="create-work-order hidden">
       <h3>Create New Work Order</h3>
       <form>
-        <label>Title:
-          <input type="text" placeholder="Enter title" required>
-        </label><br>
-        <label>Description:
-          <textarea placeholder="Describe the task" required></textarea>
-        </label><br>
-        <label>Due Date:
-          <input type="date" required>
-        </label><br>
+        <label>Title:<input type="text" placeholder="Enter title" required></label><br>
+        <label>Description:<textarea placeholder="Describe the task" required></textarea></label><br>
+        <label>Due Date:<input type="date" required></label><br>
         <button type="submit">Submit</button>
         <button type="button" class="cancel-btn" onclick="hideWorkOrder()">Cancel</button>
       </form>
@@ -364,6 +391,7 @@
         <li>Work Order #3: Backup system</li>
       </ul>
     </div>
+
   </div>
 
   <script>
@@ -389,9 +417,10 @@
     }
 
     function toggleProfileSidebar() {
-      const profileSidebar = document.getElementById('profileSidebar');
-      profileSidebar.classList.toggle('open');
+      const sidebar = document.getElementById('profile-sidebar');
+      sidebar.classList.toggle('open');
     }
   </script>
+
 </body>
 </html>
