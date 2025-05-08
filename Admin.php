@@ -149,12 +149,6 @@
       <p>100% insurance for your goods</p>
     </div>
 
-    <div class="card">
-      <h4>Finance Flow</h4>
-      <p><strong>$2,530</strong> <br>September 2021</p>
-      <div class="chart-placeholder"></div>
-    </div>
-
     <div class="card recent-orders" style="grid-column: 1 / -1;">
       <h4>Recent Orders</h4>
       <table>
