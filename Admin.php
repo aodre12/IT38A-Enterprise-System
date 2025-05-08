@@ -115,7 +115,7 @@
 <body>
 
   <div class="header">
-    <h2>UtiliTrack Dashboard</h2>
+    <h2>UtiliTrack Admin Dashboard</h2>
     <div>👤 <?php echo $_SESSION['username'] ?? 'User'; ?></div>
   </div>
 
