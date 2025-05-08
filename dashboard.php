@@ -163,8 +163,6 @@
     <h1>Welcome to Your Dashboard</h1>
     <p>This is where your existing dashboard content will go.</p>
 
-    <!-- Existing Dashboard content starts here -->
-    <!-- Example blocks -->
     <div style="margin-top: 20px;">
       <h2>Tasks Overview</h2>
       <p>[Insert your tasks table or stats here]</p>
