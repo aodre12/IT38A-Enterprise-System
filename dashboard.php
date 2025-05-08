@@ -1,397 +1,182 @@
-<?php session_start(); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Dashboard</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard with Sidebar</title>
+  
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
   <style>
     body {
-      font-family: Arial, sans-serif;
       margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: row;
-      height: 100vh;
-      background-color: #f9f9f9;
-    }
-
-    .hamburger-menu {
-      font-size: 30px;
-      cursor: pointer;
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      z-index: 1000;
-      color: black;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f5f5f5;
     }
 
     .sidebar {
       width: 250px;
-      background-color: #172a3a;
-      color: white;
-      position: fixed;
-      height: 100%;
-      top: 0;
-      left: -250px;
-      transition: 0.3s;
+      background-color: #ffffff;
+      border-right: 1px solid #e0e0e0;
       display: flex;
       flex-direction: column;
-      padding-top: 20px;
-      z-index: 999;
+      justify-content: space-between;
+      position: fixed;
+      height: 100vh;
+      padding: 20px;
     }
 
-    .sidebar.open {
-      left: 0;
+    .logo h2 {
+      font-size: 22px;
+      color: #003049;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
-    .sidebar h2 {
-      margin: 0;
-      font-size: 24px;
-      margin-bottom: 30px;
-      text-align: center;
+    .menu-section {
+      flex-grow: 1;
+      margin-top: 30px;
     }
 
-    .sidebar a {
-      color: white;
+    .menu-group h4 {
+      font-size: 12px;
+      color: #999;
+      margin: 20px 0 10px;
+      text-transform: uppercase;
+    }
+
+    .menu-group a {
       text-decoration: none;
-      font-size: 18px;
-      margin-bottom: 15px;
-      padding-left: 20px;
+      color: #003049;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
       transition: 0.3s;
+      position: relative;
     }
 
-    .sidebar a:hover {
-      color: #ffb703;
+    .menu-group a:hover {
+      color: #219ebc;
+    }
+
+    .badge {
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 12px;
+      margin-left: auto;
+    }
+
+    .green {
+      background-color: #90be6d;
+      color: white;
+    }
+
+    .yellow {
+      background-color: #f9c74f;
+      color: white;
+    }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+    }
+
+    .profile img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
+
+    .profile-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .profile-info .name {
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .profile-info .email {
+      font-size: 12px;
+      color: #777;
     }
 
     .main-content {
-      margin-left: 0;
-      padding: 20px;
-      width: 100%;
-      transition: margin-left 0.3s;
+      margin-left: 250px;
+      padding: 30px;
     }
 
-    .header {
-      background-color: #172a3a;
-      padding: 10px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid #aaa;
+    .main-content h1 {
+      color: #003049;
     }
 
-    .header h2 {
-      margin: 0;
-      color: white;
-    }
-
-    .user-icon {
-      font-size: 24px;
-      cursor: pointer;
-      color: white;
-    }
-
-    .search-bar {
-      margin: 20px 0;
-      display: flex;
-      justify-content: center;
-    }
-
-    .search-bar input {
-      padding: 10px;
-      border-radius: 15px;
-      border: 1px solid #ccc;
-      width: 300px;
-    }
-
-    .content {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 20px;
-      padding: 20px;
-    }
-
-    .card {
-      background-color: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-
-    .card h3 {
-      margin-top: 0;
-      margin-bottom: 10px;
-    }
-
-    .task-list, .work-list {
-      list-style: none;
-      padding-left: 0;
-    }
-
-    .task-list li, .work-list li {
-      margin: 5px 0;
-      padding-left: 10px;
-      border-left: 3px solid #ccc;
-    }
-
-    .checkbox {
-      margin-right: 5px;
-    }
-
-    .card button {
-      padding: 10px;
-      background-color: #006d77;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      width: 100%;
-      margin-top: 10px;
-    }
-
-    .card button:hover {
-      background-color: #004f56;
-    }
-
-    .create-work-order {
-      background-color: #fff;
-      border: 1px solid #ccc;
-      padding: 25px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      margin: 20px;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    .create-work-order input,
-    .create-work-order textarea {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-
-    .create-work-order button {
-      padding: 10px 15px;
-      background-color: #006d77;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      margin-right: 10px;
-      cursor: pointer;
-    }
-
-    .create-work-order button:hover {
-      background-color: #004f56;
-    }
-
-    .cancel-btn {
-      background-color: #ccc;
-      color: black;
-    }
-
-    .cancel-btn:hover {
-      background-color: #999;
-    }
-
-    .work-orders-list {
-      display: none;
-      padding: 15px;
-      background-color: white;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      margin-top: 20px;
-    }
-
-    .work-orders-list ul {
-      list-style: none;
-      padding-left: 0;
-    }
-
-    .work-orders-list li {
-      padding: 10px;
-      border-bottom: 1px solid #eee;
-    }
-
-    /* Profile Sidebar */
-    .profile-sidebar {
-      position: fixed;
-      right: -250px;
-      top: 0;
-      width: 250px;
-      height: 100%;
-      background-color: #003049;
-      color: white;
-      padding: 20px;
-      box-shadow: -2px 0 10px rgba(0,0,0,0.2);
-      transition: right 0.3s ease-in-out;
-      z-index: 998;
-    }
-
-    .profile-sidebar.open {
-      right: 0;
-    }
-
-    .profile-sidebar h3 {
-      margin-top: 0;
-      margin-bottom: 20px;
-    }
-
-    .profile-sidebar a {
-      display: block;
-      color: #ffb703;
-      text-decoration: none;
-      margin-bottom: 10px;
-    }
-
-    .profile-sidebar a:hover {
-      text-decoration: underline;
-    }
+    /* You can customize more of your dashboard here */
   </style>
 </head>
 <body>
 
-  <!-- Hamburger Menu Icon -->
-  <div class="hamburger-menu" onclick="toggleSidebar()">☰</div>
-
   <!-- Sidebar -->
-  <div id="sidebar" class="sidebar">
-    <h2>Dashboard</h2>
-    <a href="profile.php">Profile</a>
-    <a href="tasks.php">Tasks</a>
-    <a href="reports.php">Reports</a>
-    <a href="settings.php">Settings</a>
-    <a href="logout.php">Logout</a>
-  </div>
+  <div class="sidebar">
+    <div class="logo">
+      <h2><i class="fas fa-layer-group"></i> Marketerz</h2>
+    </div>
 
-  <!-- Profile Sidebar -->
-  <div id="profileSidebar" class="profile-sidebar">
-    <h3>Profile Settings</h3>
-    <a href="edit_profile.php">Edit Profile</a>
-    <a href="change_password.php">Change Password</a>
-    <a href="activity_logs.php">Activity Logs</a>
+    <div class="menu-section">
+      <div class="menu-group">
+        <h4>MAIN</h4>
+        <a href="#"><i class="fas fa-calendar-alt"></i> Calendar</a>
+        <a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <a href="#"><i class="fas fa-clipboard-list"></i> Job Schedule</a>
+        <a href="#"><i class="fas fa-tasks"></i> Work Orders</a>
+        <a href="#"><i class="fas fa-boxes"></i> Asset Inventory</a>
+        <a href="#"><i class="fas fa-chart-line"></i> Reports</a>
+      </div>
+
+      <div class="menu-group">
+        <h4>ACCOUNT</h4>
+        <a href="#"><i class="fas fa-bell"></i> Notifications <span class="badge green">24</span></a>
+        <a href="#"><i class="fas fa-comments"></i> Chat <span class="badge yellow">8</span></a>
+        <a href="#"><i class="fas fa-life-ring"></i> Help & Support</a>
+        <a href="#"><i class="fas fa-cog"></i> Settings</a>
+      </div>
+    </div>
+
+    <div class="profile">
+      <img src="https://i.pravatar.cc/40" alt="Profile" />
+      <div class="profile-info">
+        <p class="name">Nina Eregnia</p>
+        <p class="email">nina_ereg@emia.com</p>
+      </div>
+    </div>
   </div>
 
   <!-- Main Content -->
   <div class="main-content">
+    <h1>Welcome to Your Dashboard</h1>
+    <p>This is where your existing dashboard content will go.</p>
 
-    <!-- Header -->
-    <div class="header">
-      <h2>Welcome to UtiliTrack</h2>
-      <div class="user-icon" onclick="toggleProfileSidebar()">👤</div>
+    <!-- Existing Dashboard content starts here -->
+    <!-- Example blocks -->
+    <div style="margin-top: 20px;">
+      <h2>Tasks Overview</h2>
+      <p>[Insert your tasks table or stats here]</p>
     </div>
 
-    <!-- Search Bar -->
-    <div class="search-bar">
-      <input type="text" placeholder="Search...">
+    <div style="margin-top: 20px;">
+      <h2>Recent Work Orders</h2>
+      <p>[Insert your work orders section here]</p>
     </div>
 
-    <!-- Dashboard Content -->
-    <div class="content">
-      <div class="card">
-        <h3>Dashboard</h3>
-        <ul class="task-list">
-          <li>Work order overview</li>
-          <li>Assign Task</li>
-          <li>Task Status</li>
-        </ul>
-      </div>
-
-      <div class="card">
-        <h3>Work Orders</h3>
-        <ul class="work-list">
-          <li><button onclick="showWorkOrders()">Show Work Orders</button></li>
-        </ul>
-      </div>
-
-      <div class="card">
-        <h3>Pending Task</h3>
-        <ul class="task-list">
-          <li>Fix server issue</li>
-          <li>Review report</li>
-        </ul>
-      </div>
-
-      <div class="card">
-        <h3>Completed Task</h3>
-        <ul class="task-list">
-          <li><input type="checkbox" class="checkbox" checked>Backup done</li>
-          <li><input type="checkbox" class="checkbox" checked>System updated</li>
-        </ul>
-      </div>
-
-      <div class="card">
-        <h3>Create Work Orders</h3>
-        <button onclick="showWorkOrder()">➕ New Order</button>
-      </div>
-
-      <div class="card" style="grid-column: 1 / -1;">
-        <h3>Reports</h3>
-        <p>No reports available.</p>
-      </div>
-    </div>
-
-    <!-- Work Order Form -->
-    <div id="create-work-order" class="create-work-order hidden">
-      <h3>Create New Work Order</h3>
-      <form>
-        <label>Title:
-          <input type="text" placeholder="Enter title" required>
-        </label><br>
-        <label>Description:
-          <textarea placeholder="Describe the task" required></textarea>
-        </label><br>
-        <label>Due Date:
-          <input type="date" required>
-        </label><br>
-        <button type="submit">Submit</button>
-        <button type="button" class="cancel-btn" onclick="hideWorkOrder()">Cancel</button>
-      </form>
-    </div>
-
-    <!-- Work Orders List -->
-    <div id="work-orders-list" class="work-orders-list">
-      <h3>Work Orders List</h3>
-      <ul>
-        <li>Work Order #1: Fix server issue</li>
-        <li>Work Order #2: Update software</li>
-        <li>Work Order #3: Backup system</li>
-      </ul>
-    </div>
-
+    <!-- End of existing dashboard content -->
   </div>
-
-  <script>
-    function toggleSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      const mainContent = document.querySelector('.main-content');
-      sidebar.classList.toggle('open');
-      mainContent.style.marginLeft = sidebar.classList.contains('open') ? '250px' : '0';
-    }
-
-    function toggleProfileSidebar() {
-      const profileSidebar = document.getElementById('profileSidebar');
-      profileSidebar.classList.toggle('open');
-    }
-
-    function showWorkOrder() {
-      document.getElementById('create-work-order').classList.remove('hidden');
-      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-    }
-
-    function hideWorkOrder() {
-      document.getElementById('create-work-order').classList.add('hidden');
-    }
-
-    function showWorkOrders() {
-      const workOrdersList = document.getElementById('work-orders-list');
-      workOrdersList.classList.toggle('hidden');
-    }
-  </script>
 
 </body>
 </html>
