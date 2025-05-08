@@ -123,16 +123,16 @@
 
     <div class="card stat-cards">
       <div class="stat">
-        <h3>54,235</h3>
-        <p>Customers</p>
+        <h3>423</h3>
+        <p>Users</p>
       </div>
       <div class="stat">
-        <h3>$980,632</h3>
+        <h3>80,632</h3>
         <p>Income</p>
       </div>
       <div class="stat">
         <h3>5,490</h3>
-        <p>Products Sold</p>
+        <p>Work Orders</p>
       </div>
     </div>
 
