@@ -157,7 +157,7 @@
 
   <!-- Main Content -->
   <div class="main-content">
-    <h1>Welcome to Your Dashboard</h1>
+    <h1>Welcome to UtiliTrack!</h1>
     <p>This is where your existing dashboard content will go.</p>
 
     <div style="margin-top: 20px;">
