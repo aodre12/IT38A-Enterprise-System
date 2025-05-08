@@ -21,7 +21,7 @@
       border-right: 1px solid #e0e0e0;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      justify-content: flex-start;  /* Align items to start */
       position: fixed;
       height: 100vh;
       padding: 20px;
@@ -33,6 +33,35 @@
       display: flex;
       align-items: center;
       gap: 10px;
+    }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 20px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .profile img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
+
+    .profile-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .profile-info .name {
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .profile-info .email {
+      font-size: 12px;
+      color: #777;
     }
 
     .menu-section {
@@ -79,36 +108,6 @@
       color: white;
     }
 
-    .profile {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 30px;
-      padding-top: 20px;
-      border-top: 1px solid #eee;
-    }
-
-    .profile img {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-    }
-
-    .profile-info {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .profile-info .name {
-      font-weight: bold;
-      font-size: 14px;
-    }
-
-    .profile-info .email {
-      font-size: 12px;
-      color: #777;
-    }
-
     .main-content {
       margin-left: 250px;
       padding: 30px;
@@ -125,19 +124,25 @@
 
   <!-- Sidebar -->
   <div class="sidebar">
-    <div class="logo">
-      <h2><i class="fas fa-layer-group"></i> Marketerz</h2>
+    <!-- Profile section moved to the top -->
+    <div class="profile">
+      <img src="https://i.pravatar.cc/40" alt="Profile" />
+      <div class="profile-info">
+        <p class="name">John Doe</p>
+        <p class="email">doeejon@gmail.com</p>
+      </div>
     </div>
 
     <div class="menu-section">
       <div class="menu-group">
         <h4>MAIN</h4>
-        <a href="#"><i class="fas fa-calendar-alt"></i> Calendar</a>
         <a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
         <a href="#"><i class="fas fa-clipboard-list"></i> Job Schedule</a>
         <a href="#"><i class="fas fa-tasks"></i> Work Orders</a>
         <a href="#"><i class="fas fa-boxes"></i> Asset Inventory</a>
         <a href="#"><i class="fas fa-chart-line"></i> Reports</a>
+        <a href="#"><i class="fas fa-calendar-alt"></i> Calendar</a>
+
       </div>
 
       <div class="menu-group">
@@ -146,14 +151,6 @@
         <a href="#"><i class="fas fa-comments"></i> Chat <span class="badge yellow">8</span></a>
         <a href="#"><i class="fas fa-life-ring"></i> Help & Support</a>
         <a href="#"><i class="fas fa-cog"></i> Settings</a>
-      </div>
-    </div>
-
-    <div class="profile">
-      <img src="https://i.pravatar.cc/40" alt="Profile" />
-      <div class="profile-info">
-        <p class="name">Nina Eregnia</p>
-        <p class="email">nina_ereg@emia.com</p>
       </div>
     </div>
   </div>
