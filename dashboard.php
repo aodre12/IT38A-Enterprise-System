@@ -249,21 +249,27 @@
       <i class="fa fa-bars"></i>
     </button>
     <nav class="nav">
-      <ul>
-        <li>
-          <a href="#" class="active"><i class="fa fa-clock"></i><span>Dashbaord</span></a>
-        </li>
-        <li>
-          <a href="#"><i class="fa fa-home"></i><span>Home</span></a>
-        </li>
-        <li>
-          <a href="#"><i class="fa fa-table"></i><span>Products</span></a>
-        </li>
-        <li>
-          <a href="#"><i class="fa fa-users"></i><span>Customers</span></a>
-        </li>
-      </ul>
-    </nav>
+  <ul>
+    <li>
+      <a href="#" class="active"><i class="fa-solid fa-gauge"></i><span>Dashboard</span></a>
+    </li>
+    <li>
+      <a href="#"><i class="fa-solid fa-clipboard"></i><span>Job Schedule</span></a>
+    </li>
+    <li>
+      <a href="#"><i class="fa-solid fa-list"></i><span>Work Orders</span></a>
+    </li>
+    <li>
+      <a href="#"><i class="fa-solid fa-boxes-stacked"></i><span>Asset Inventory</span></a>
+    </li>
+    <li>
+      <a href="#"><i class="fa-solid fa-chart-line"></i><span>Reports</span></a>
+    </li>
+    <li>
+      <a href="#"><i class="fa-solid fa-calendar-days"></i><span>Calendar</span></a>
+    </li>
+  </ul>
+</nav>
     <div class="user">
       <i class="fa fa-user"></i>
       <span>Yousaf</span>
