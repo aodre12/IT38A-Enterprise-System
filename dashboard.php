@@ -24,24 +24,26 @@
       padding: 20px 0;
       transition: width 0.3s;
       position: relative;
+      overflow: hidden;
     }
     .sidebar.expanded {
       width: 250px;
       align-items: flex-start;
     }
     .sidebar .menu-btn {
-  background: none;
-  border: none;
-  color: #7c7cff;
-  font-size: 24px;
-  margin-bottom: 30px;
-  cursor: pointer;
-  align-self: flex-start;
-  margin-left: 20px;
-}
+      background: none;
+      border: none;
+      color: #7c7cff;
+      font-size: 24px;
+      margin-bottom: 30px;
+      cursor: pointer;
+      align-self: flex-start;
+      margin-left: 20px;
+    }
     .sidebar .nav {
       width: 100%;
       flex: 1;
+      overflow: hidden;
     }
     .sidebar .nav ul {
       list-style: none;
@@ -62,7 +64,8 @@
       border-radius: 8px;
       transition: background 0.2s;
       font-size: 16px;
-      width: 100%;
+      width: calc(100% - 40px);
+      margin: 0 10px;
     }
     .sidebar .nav a.active, .sidebar .nav a:hover {
       background: #5959e6;
