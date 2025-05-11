@@ -66,7 +66,6 @@
       font-size: 16px;
       width: calc(100% - 40px);
       margin: 0 10px;
-      position: relative;
     }
     .sidebar .nav a.active, .sidebar .nav a:hover {
       background: #5959e6;
@@ -85,79 +84,6 @@
     .sidebar .nav a span {
       display: none;
     }
-
-    /* Account section styles */
-    .account-section {
-      width: 100%;
-      margin-top: 30px;
-      padding: 0 20px 20px;
-    }
-    .account-title {
-      font-weight: bold;
-      color: #999;
-      font-size: 15px;
-      margin-bottom: 10px;
-      letter-spacing: 1px;
-    }
-    .account-section ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-    .account-section li {
-      margin-bottom: 15px;
-    }
-    .account-section a {
-      display: flex;
-      align-items: center;
-      color: #fff;
-      text-decoration: none;
-      font-size: 17px;
-      position: relative;
-      padding: 0;
-      border-radius: 8px;
-      transition: background 0.2s;
-      width: 100%;
-    }
-    .account-section a:hover {
-      background: #5959e6;
-    }
-    .account-section i {
-      font-size: 20px;
-      margin-right: 12px;
-      color: #fff;
-      width: 24px;
-      text-align: center;
-    }
-    .account-section .badge {
-      margin-left: auto;
-      font-size: 13px;
-      padding: 2px 10px;
-      border-radius: 12px;
-      color: #fff;
-      font-weight: bold;
-      min-width: 24px;
-      text-align: center;
-      margin-right: 5px;
-    }
-    .account-section .badge-green {
-      background: #8fd19e;
-    }
-    .account-section .badge-yellow {
-      background: #f6c96b;
-      color: #fff;
-    }
-    .sidebar.expanded .account-section a span {
-      display: inline;
-      margin-left: 15px;
-    }
-    .account-section a span {
-      display: none;
-    }
-    .sidebar.expanded .account-section a span {
-      display: inline;
-    }
-
     .sidebar .user {
       margin-top: auto;
       width: 100%;
@@ -195,12 +121,13 @@
 
     /* Dashboard styles */
     .header {
-      background-color: #cce5ff;
+      background-color: #23242a;
       padding: 10px 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid #aaa;
+      border-bottom: 1px solid #222;
+      color: #fff;
     }
     .header h2 {
       margin: 0;
@@ -217,14 +144,65 @@
     .search-bar input {
       padding: 10px;
       border-radius: 15px;
-      border: 1px solid #ccc;
+      border: 1px solid #333;
       width: 300px;
+      background: #23242a;
+      color: #fff;
     }
     .content {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 20px;
-      padding: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      padding: 32px;
+    }
+    .restore-card {
+      background: #23242a;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+      color: #fff;
+      padding: 0;
+      min-height: 220px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .restore-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 24px 24px 8px 24px;
+      background: rgba(0,0,0,0.08);
+    }
+    .restore-icon {
+      font-size: 2.2rem;
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .restore-files { background: #a259ff; }
+    .restore-bookmarks { background: #ffb300; }
+    .restore-contacts { background: #3ec6ff; }
+    .restore-calendars { background: #ff4d4f; }
+    .restore-title {
+      font-size: 1.35rem;
+      font-weight: 600;
+      margin: 0;
+    }
+    .restore-status {
+      font-size: 1.05rem;
+      color: #bdbdbd;
+      margin-left: 2px;
+      margin-top: 2px;
+    }
+    .restore-body {
+      flex: 1;
+      padding: 16px 24px 24px 24px;
+      display: flex;
+      align-items: flex-start;
+      font-size: 1.08rem;
+      color: #bdbdbd;
     }
     .card {
       background-color: white;
@@ -325,42 +303,19 @@
     <nav class="nav">
       <ul>
         <li>
-          <a href="#" class="active"><i class="fa-solid fa-gauge"></i><span>Dashboard</span></a>
+          <a href="#" class="active"><i class="fa fa-clock"></i><span>Dashbaord</span></a>
         </li>
         <li>
-          <a href="#"><i class="fa-solid fa-clipboard"></i><span>Job Schedule</span></a>
+          <a href="#"><i class="fa fa-home"></i><span>Home</span></a>
         </li>
         <li>
-          <a href="#"><i class="fa-solid fa-list"></i><span>Work Orders</span></a>
+          <a href="#"><i class="fa fa-table"></i><span>Products</span></a>
         </li>
         <li>
-          <a href="#"><i class="fa-solid fa-boxes-stacked"></i><span>Asset Inventory</span></a>
-        </li>
-        <li>
-          <a href="#"><i class="fa-solid fa-chart-line"></i><span>Reports</span></a>
-        </li>
-        <li>
-          <a href="#"><i class="fa-solid fa-calendar-days"></i><span>Calendar</span></a>
+          <a href="#"><i class="fa fa-users"></i><span>Customers</span></a>
         </li>
       </ul>
     </nav>
-    <div class="account-section">
-      <div class="account-title">ACCOUNT</div>
-      <ul>
-        <li>
-          <a href="#"><i class="fa-solid fa-bell"></i><span>Notifications</span><span class="badge badge-green">24</span></a>
-        </li>
-        <li>
-          <a href="#"><i class="fa-solid fa-comments"></i><span>Chat</span><span class="badge badge-yellow">8</span></a>
-        </li>
-        <li>
-          <a href="#"><i class="fa-solid fa-life-ring"></i><span>Help & Support</span></a>
-        </li>
-        <li>
-          <a href="#"><i class="fa-solid fa-gear"></i><span>Settings</span></a>
-        </li>
-      </ul>
-    </div>
     <div class="user">
       <i class="fa fa-user"></i>
       <span>Yousaf</span>
@@ -374,41 +329,45 @@
       <input type="text" placeholder="Search...">
     </div>
     <main class="content">
-      <div class="card">
-        <h3>Dashboard</h3>
-        <ul class="task-list">
-          <li>Work order overview</li>
-          <li>Assign Task</li>
-          <li>Task Status</li>
-        </ul>
+      <div class="restore-card">
+        <div class="restore-header">
+          <span class="restore-icon restore-files"><i class="fa fa-file-alt"></i></span>
+          <div>
+            <div class="restore-title">Restore Files</div>
+            <div class="restore-status">No Files</div>
+          </div>
+        </div>
+        <div class="restore-body">-</div>
       </div>
-      <div class="card">
-        <h3>Work Orders</h3>
-        <ul class="work-list">
-          <li><button onclick="showWorkOrders()">Show Work Orders</button></li>
-        </ul>
+      <div class="restore-card">
+        <div class="restore-header">
+          <span class="restore-icon restore-bookmarks"><i class="fa fa-bookmark"></i></span>
+          <div>
+            <div class="restore-title">Restore Bookmarks</div>
+            <div class="restore-status">No Bookmarks</div>
+          </div>
+        </div>
+        <div class="restore-body">-</div>
       </div>
-      <div class="card">
-        <h3>Pending Task</h3>
-        <ul class="task-list">
-          <li>Fix server issue</li>
-          <li>Review report</li>
-        </ul>
+      <div class="restore-card">
+        <div class="restore-header">
+          <span class="restore-icon restore-contacts"><i class="fa fa-user-circle"></i></span>
+          <div>
+            <div class="restore-title">Restore Contacts</div>
+            <div class="restore-status">1 Archive</div>
+          </div>
+        </div>
+        <div class="restore-body">Apr 13, 2025 7:59 AM</div>
       </div>
-      <div class="card">
-        <h3>Completed Task</h3>
-        <ul class="task-list">
-          <li><input type="checkbox" class="checkbox" checked>Backup done</li>
-          <li><input type="checkbox" class="checkbox" checked>System updated</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3>Create Work Orders</h3>
-        <button onclick="showWorkOrder()">➕ New Order</button>
-      </div>
-      <div class="card" style="grid-column: 1 / -1;">
-        <h3>Reports</h3>
-        <p>No reports available.</p>
+      <div class="restore-card">
+        <div class="restore-header">
+          <span class="restore-icon restore-calendars"><i class="fa fa-calendar-alt"></i></span>
+          <div>
+            <div class="restore-title">Restore Calendars</div>
+            <div class="restore-status">No Archives</div>
+          </div>
+        </div>
+        <div class="restore-body">-</div>
       </div>
     </main>
     <!-- Work Order Form (hidden initially) -->
