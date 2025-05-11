@@ -66,6 +66,7 @@
       font-size: 16px;
       width: calc(100% - 40px);
       margin: 0 10px;
+      position: relative;
     }
     .sidebar .nav a.active, .sidebar .nav a:hover {
       background: #5959e6;
@@ -84,6 +85,79 @@
     .sidebar .nav a span {
       display: none;
     }
+
+    /* Account section styles */
+    .account-section {
+      width: 100%;
+      margin-top: 30px;
+      padding: 0 20px 20px;
+    }
+    .account-title {
+      font-weight: bold;
+      color: #999;
+      font-size: 15px;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+    }
+    .account-section ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .account-section li {
+      margin-bottom: 15px;
+    }
+    .account-section a {
+      display: flex;
+      align-items: center;
+      color: #fff;
+      text-decoration: none;
+      font-size: 17px;
+      position: relative;
+      padding: 0;
+      border-radius: 8px;
+      transition: background 0.2s;
+      width: 100%;
+    }
+    .account-section a:hover {
+      background: #5959e6;
+    }
+    .account-section i {
+      font-size: 20px;
+      margin-right: 12px;
+      color: #fff;
+      width: 24px;
+      text-align: center;
+    }
+    .account-section .badge {
+      margin-left: auto;
+      font-size: 13px;
+      padding: 2px 10px;
+      border-radius: 12px;
+      color: #fff;
+      font-weight: bold;
+      min-width: 24px;
+      text-align: center;
+      margin-right: 5px;
+    }
+    .account-section .badge-green {
+      background: #8fd19e;
+    }
+    .account-section .badge-yellow {
+      background: #f6c96b;
+      color: #fff;
+    }
+    .sidebar.expanded .account-section a span {
+      display: inline;
+      margin-left: 15px;
+    }
+    .account-section a span {
+      display: none;
+    }
+    .sidebar.expanded .account-section a span {
+      display: inline;
+    }
+
     .sidebar .user {
       margin-top: auto;
       width: 100%;
@@ -249,27 +323,44 @@
       <i class="fa fa-bars"></i>
     </button>
     <nav class="nav">
-  <ul>
-    <li>
-      <a href="#" class="active"><i class="fa-solid fa-gauge"></i><span>Dashboard</span></a>
-    </li>
-    <li>
-      <a href="#"><i class="fa-solid fa-clipboard"></i><span>Job Schedule</span></a>
-    </li>
-    <li>
-      <a href="#"><i class="fa-solid fa-list"></i><span>Work Orders</span></a>
-    </li>
-    <li>
-      <a href="#"><i class="fa-solid fa-boxes-stacked"></i><span>Asset Inventory</span></a>
-    </li>
-    <li>
-      <a href="#"><i class="fa-solid fa-chart-line"></i><span>Reports</span></a>
-    </li>
-    <li>
-      <a href="#"><i class="fa-solid fa-calendar-days"></i><span>Calendar</span></a>
-    </li>
-  </ul>
-</nav>
+      <ul>
+        <li>
+          <a href="#" class="active"><i class="fa-solid fa-gauge"></i><span>Dashboard</span></a>
+        </li>
+        <li>
+          <a href="#"><i class="fa-solid fa-clipboard"></i><span>Job Schedule</span></a>
+        </li>
+        <li>
+          <a href="#"><i class="fa-solid fa-list"></i><span>Work Orders</span></a>
+        </li>
+        <li>
+          <a href="#"><i class="fa-solid fa-boxes-stacked"></i><span>Asset Inventory</span></a>
+        </li>
+        <li>
+          <a href="#"><i class="fa-solid fa-chart-line"></i><span>Reports</span></a>
+        </li>
+        <li>
+          <a href="#"><i class="fa-solid fa-calendar-days"></i><span>Calendar</span></a>
+        </li>
+      </ul>
+    </nav>
+    <div class="account-section">
+      <div class="account-title">ACCOUNT</div>
+      <ul>
+        <li>
+          <a href="#"><i class="fa-solid fa-bell"></i><span>Notifications</span><span class="badge badge-green">24</span></a>
+        </li>
+        <li>
+          <a href="#"><i class="fa-solid fa-comments"></i><span>Chat</span><span class="badge badge-yellow">8</span></a>
+        </li>
+        <li>
+          <a href="#"><i class="fa-solid fa-life-ring"></i><span>Help & Support</span></a>
+        </li>
+        <li>
+          <a href="#"><i class="fa-solid fa-gear"></i><span>Settings</span></a>
+        </li>
+      </ul>
+    </div>
     <div class="user">
       <i class="fa fa-user"></i>
       <span>Yousaf</span>
