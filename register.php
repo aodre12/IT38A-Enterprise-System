@@ -1,12 +1,10 @@
 <?php
 session_start();
+require_once 'config.php'; // ✅ Connects to your database
+
 $error = '';
-$success_message = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $valid_username = 'johndoe';
-    $valid_password = 'password123';
-
     $username = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
     $confirm_password = $_POST['confirm_password'] ?? '';
@@ -15,13 +13,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'All fields are required.';
     } elseif ($password !== $confirm_password) {
         $error = 'Passwords do not match.';
-    } elseif ($username === $valid_username) {
-        $error = 'Username already exists.';
     } else {
-        $_SESSION['username'] = $username;
-        header('Location: dashboard.php');
-        exit;
+        // Check if username already exists in the database
+        $stmt = $conn->prepare("SELECT id FROM users WHERE username = ?");
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $stmt->store_result();
+
+        if ($stmt->num_rows > 0) {
+            $error = 'Username already exists.';
+        } else {
+            // Hash the password
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+            $role = 'user'; // Default role
+
+            // Insert into database
+            $stmt = $conn->prepare("INSERT INTO users (username, password, role) VALUES (?, ?, ?)");
+            $stmt->bind_param("sss", $username, $hashed_password, $role);
+
+            if ($stmt->execute()) {
+                $_SESSION['success_message'] = 'Registration successful! You can now log in.';
+                header('Location: login.php');
+                exit;
+            } else {
+                $error = 'Registration failed. Please try again.';
+            }
+        }
+
+        $stmt->close();
     }
+
+    $conn->close();
 }
 ?>
 
@@ -128,10 +150,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <?php if ($error): ?>
             <div class="error"><?= htmlspecialchars($error) ?></div>
-        <?php endif; ?>
-
-        <?php if ($success_message): ?>
-            <div class="success"><?= htmlspecialchars($success_message) ?></div>
         <?php endif; ?>
 
         <form method="POST" action="">
