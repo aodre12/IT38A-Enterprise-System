@@ -158,11 +158,11 @@
   <!-- Main Content -->
   <div class="main-content">
     <h1>Welcome to UtiliTrack!</h1>
-    <p>This is where your existing dashboard content will go.</p>
+    <p>**dashboard content**</p>
 
     <div style="margin-top: 20px;">
       <h2>Tasks Overview</h2>
-      <p>[Insert your tasks table or stats here]</p>
+      <p>**tasks table**</p>
     </div>
 
     <div style="margin-top: 20px;">

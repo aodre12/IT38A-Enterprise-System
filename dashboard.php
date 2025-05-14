@@ -46,6 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['new_task'])) {
 <head>
   <meta charset="UTF-8">
   <title>Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -58,17 +59,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['new_task'])) {
       padding: 10px 20px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
       border-bottom: 1px solid #aaa;
+      position: sticky;
+      top: 0;
+      z-index: 900;
     }
 
     .header h2 {
       margin: 0;
-    }
-
-    .header .user-icon {
-      font-size: 24px;
-      cursor: pointer;
+      color: #003049;
+      font-size: 1.5rem;
     }
 
     .search-bar {
@@ -89,6 +89,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['new_task'])) {
       grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
       gap: 20px;
       padding: 20px;
+      margin-left: 250px;
+      transition: margin-left 0.3s;
     }
 
     .card {
@@ -151,19 +153,183 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['new_task'])) {
       padding: 10px;
       border-bottom: 1px solid #eee;
     }
+
+    /* Hamburger styles */
+    .hamburger {
+      font-size: 24px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      color: #003049;
+      z-index: 2001;
+      position: fixed;
+      left: 20px;
+      top: 20px;
+      display: block;
+    }
+    @media (min-width: 901px) {
+      .hamburger {
+        display: none;
+      }
+    }
+
+    /* Sidebar styles */
+    .sidebar {
+      width: 250px;
+      background-color: #ffffff;
+      border-right: 1px solid #e0e0e0;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      position: fixed;
+      height: 100vh;
+      padding: 60px 20px 20px 20px; /* Add top padding for hamburger */
+      left: 0;
+      top: 0;
+      transition: transform 0.3s ease;
+      z-index: 1000;
+    }
+    .sidebar.closed {
+      transform: translateX(-100%);
+    }
+    .sidebar .profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 20px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .sidebar .profile img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
+    .sidebar .profile-info {
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar .profile-info .name {
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .sidebar .profile-info .email {
+      font-size: 12px;
+      color: #777;
+    }
+    .sidebar .menu-section {
+      flex-grow: 1;
+      margin-top: 30px;
+    }
+    .sidebar .menu-group h4 {
+      font-size: 12px;
+      color: #999;
+      margin: 20px 0 10px;
+      text-transform: uppercase;
+    }
+    .sidebar .menu-group a {
+      text-decoration: none;
+      color: #003049;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      transition: 0.3s;
+      position: relative;
+    }
+    .sidebar .menu-group a:hover {
+      color: #219ebc;
+    }
+    .sidebar .badge {
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 12px;
+      margin-left: auto;
+    }
+    .sidebar .green {
+      background-color: #90be6d;
+      color: white;
+    }
+    .sidebar .yellow {
+      background-color: #f9c74f;
+      color: white;
+    }
+    @media (max-width: 900px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      .sidebar.open {
+        transform: translateX(0);
+      }
+      .content {
+        margin-left: 0 !important;
+      }
+    }
+    @media (max-width: 900px) {
+      .content {
+        margin-left: 0;
+      }
+    }
+
+/* Optional: backdrop overlay */
+    #backdrop {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 100vw;
+      background: rgba(0, 0, 0, 0.3);
+      z-index: 999;
+    }
+
+    #backdrop.show {
+      display: block;
+    }
   </style>
 </head>
 <body>
+  <!-- Backdrop for mobile sidebar -->
+  <div id="backdrop"></div>
 
-  <div class="header">
-    <h2>DASHBOARD</h2>
-    <div class="user-icon">👤</div>
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar closed" id="sidebar">
+    <div class="profile">
+      <img src="https://i.pravatar.cc/40" alt="Profile" />
+      <div class="profile-info">
+        <p class="name">John Doe</p>
+        <p class="email">doeejon@gmail.com</p>
+      </div>
+    </div>
+    <div class="menu-section">
+      <div class="menu-group">
+        <h4>MAIN</h4>
+        <a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <a href="#"><i class="fas fa-clipboard-list"></i> Job Schedule</a>
+        <a href="#"><i class="fas fa-tasks"></i> Work Orders</a>
+        <a href="#"><i class="fas fa-boxes"></i> Asset Inventory</a>
+        <a href="#"><i class="fas fa-chart-line"></i> Reports</a>
+        <a href="#"><i class="fas fa-calendar-alt"></i> Calendar</a>
+      </div>
+      <div class="menu-group">
+        <h4>ACCOUNT</h4>
+        <a href="#"><i class="fas fa-bell"></i> Notifications <span class="badge green">24</span></a>
+        <a href="#"><i class="fas fa-comments"></i> Chat <span class="badge yellow">8</span></a>
+        <a href="#"><i class="fas fa-life-ring"></i> Help & Support</a>
+        <a href="#"><i class="fas fa-cog"></i> Settings</a>
+      </div>
+    </div>
   </div>
-
+  <!-- Header with Hamburger -->
+  <div class="header">
+    <button class="hamburger" id="hamburger"><i class="fas fa-bars"></i></button>
+    <h2>DASHBOARD</h2>
+  </div>
   <div class="search-bar">
     <input type="text" placeholder="Search...">
   </div>
-
   <main class="content">
     <div class="card">
       <h3>Dashboard</h3>
@@ -216,6 +382,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['new_task'])) {
       <p>No reports available.</p>
     </div>
   </main>
-
+  <script>
+    // Hamburger toggle for sidebar
+    const hamburger = document.getElementById('hamburger');
+    const sidebar = document.getElementById('sidebar');
+    hamburger.addEventListener('click', function() {
+      sidebar.classList.toggle('closed');
+      sidebar.classList.toggle('open');
+    });
+    // Optional: close sidebar when clicking outside on small screens
+    document.addEventListener('click', function(e) {
+      if (window.innerWidth <= 900 && !sidebar.contains(e.target) && !hamburger.contains(e.target)) {
+        sidebar.classList.add('closed');
+        sidebar.classList.remove('open');
+      }
+    });
+  </script>
 </body>
 </html>
