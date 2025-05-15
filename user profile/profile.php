@@ -1,27 +1,24 @@
 <?php
 session_start();
-require 'config.php';  // Your DB connection
+require 'config.php';
 
-// Redirect admins away
-if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
-    header('Location: admin_dashboard.php');
-    exit;
-}
-
-// Require login
+// Redirect if not logged in or is admin
 if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
     exit;
 }
+if ($_SESSION['role'] === 'admin') {
+    header('Location: admin_dashboard.php');
+    exit;
+}
 
-$user_id  = $_SESSION['user_id'];
+$user_id = $_SESSION['user_id'];
 $username = $_SESSION['username'];
-$error    = '';
-$success  = '';
+$error = $success = '';
 
 // Handle profile update
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $name  = trim($_POST['name']  ?? '');
+    $name = trim($_POST['name'] ?? '');
     $email = trim($_POST['email'] ?? '');
 
     if ($name === '' || $email === '') {
@@ -31,16 +28,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $stmt = $conn->prepare("UPDATE personnel SET name = ?, email = ? WHERE id = ?");
         $stmt->bind_param("ssi", $name, $email, $user_id);
-        if ($stmt->execute()) {
-            $success = "Profile updated successfully.";
-        } else {
-            $error = "Failed to update profile.";
-        }
+        $stmt->execute() ? $success = "Profile updated successfully." : $error = "Update failed.";
         $stmt->close();
     }
 }
 
-// Fetch current info
+// Fetch latest profile info
 $stmt = $conn->prepare("SELECT name, email, role, status FROM personnel WHERE id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
@@ -51,126 +44,114 @@ $stmt->close();
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>My Profile</title>
   <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       background: #fef6ec;
     }
-    /* Sidebar */
-    .sidebar {
-      width: 220px;
-      background-color: #fef6ec;
-      padding: 25px 20px;
-      border-radius: 15px;
-      box-shadow: 0 0 12px rgba(0,0,0,0.1);
-      height: 100vh;
-      position: fixed;
-      top: 0; left: 0;
-      overflow-y: auto;
-    }
-    .sidebar h3 {
-      color: #007bff;
-      margin-bottom: 30px;
-      text-align: center;
-      font-weight: 700;
-      font-size: 1.4em;
-    }
-    .sidebar ul { list-style: none; padding: 0; margin: 0; }
-    .sidebar li { margin-bottom: 18px; }
-    .sidebar a {
-      color: #2c3e50; text-decoration: none;
-      font-weight: 600; display: block;
-      padding: 12px 18px; border-radius: 10px;
-      transition: background 0.3s, color 0.3s;
-      box-shadow: 0 0 5px rgba(0,123,255,0.2);
-    }
-    .sidebar a:hover {
-      background-color: #007bff; color: white;
-      box-shadow: 0 0 10px rgba(0,123,255,0.6);
-    }
-
-    /* Main content */
-    .main-content {
-      margin-left: 260px; /* leave space for sidebar */
-      padding: 40px 30px;
-    }
     .container {
+      position: relative;
       max-width: 500px;
+      margin: 60px auto;
       background: #fff;
-      padding: 25px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      margin-bottom: 40px;
+      padding: 40px 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
     }
-    h2 { margin-top: 0; color: #007bff; }
-    label { display: block; margin-top: 15px; font-weight: bold; }
+    .header-wave {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100px;
+      background: #001F54;
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+      clip-path: ellipse(100% 80% at 50% 0%);
+    }
+    h2 {
+      margin-top: 100px;
+      font-size: 28px;
+      text-align: center;
+      color: #003049;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 15px;
+    }
     input[type="text"], input[type="email"] {
-      width: 100%; padding: 10px; margin-top: 5px;
-      border: 1px solid #ccc; border-radius: 5px;
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
     }
     button {
-      margin-top: 20px; background: #007bff; color: white;
-      border: none; padding: 12px; border-radius: 6px;
-      cursor: pointer; width: 100%;
+      width: 100%;
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 6px;
+      margin-top: 20px;
+      cursor: pointer;
     }
-    button:hover { background: #0056b3; }
-    .message { text-align: center; margin-top: 15px; }
+    button:hover {
+      background: #0056b3;
+    }
+    .info p {
+      margin: 8px 0;
+      color: #555;
+    }
+    .message {
+      text-align: center;
+      margin-top: 10px;
+      font-weight: bold;
+    }
     .error { color: red; }
     .success { color: green; }
-    .info { margin-top: 15px; }
     a.back-link {
-      display: block; text-align: center;
-      margin-top: 20px; color: #007bff;
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      color: #0056b3;
       text-decoration: none;
+      font-weight: bold;
     }
-    a.back-link:hover { text-decoration: underline; }
+    a.back-link:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
+  <div class="container">
+    <div class="header-wave"></div>
+    <h2>My Profile</h2>
 
-  <div class="sidebar">
-    <h3>Welcome, <?= htmlspecialchars($username) ?></h3>
-    <ul>
-      <li><a href="user_dashboard.php">Dashboard</a></li>
-      <li><a href="work_orders.php">My Work Orders</a></li>
-      <li><a href="tasks.php">My Tasks</a></li>
-      <li><a href="profile.php">My Profile</a></li>
-      <li><a href="reset_password.php">Reset Password</a></li>
-      <li><a href="logout.php">Logout</a></li>
-    </ul>
-  </div>
+    <?php if ($error): ?>
+      <div class="message error"><?= htmlspecialchars($error) ?></div>
+    <?php elseif ($success): ?>
+      <div class="message success"><?= htmlspecialchars($success) ?></div>
+    <?php endif; ?>
 
-  <div class="main-content">
-    <div class="container">
-      <h2>My Profile</h2>
+    <form method="POST">
+      <label for="name">Name</label>
+      <input type="text" name="name" id="name" value="<?= htmlspecialchars($name) ?>" required>
 
-      <?php if ($error): ?>
-        <div class="message error"><?= htmlspecialchars($error) ?></div>
-      <?php elseif ($success): ?>
-        <div class="message success"><?= htmlspecialchars($success) ?></div>
-      <?php endif; ?>
+      <label for="email">Email</label>
+      <input type="email" name="email" id="email" value="<?= htmlspecialchars($email) ?>" required>
 
-      <form method="POST" action="">
-        <label for="name">Name</label>
-        <input type="text" id="name" name="name" value="<?= htmlspecialchars($name) ?>" required>
+      <div class="info">
+        <p><strong>Role:</strong> <?= htmlspecialchars($role) ?></p>
+        <p><strong>Status:</strong> <?= htmlspecialchars($status) ?></p>
+      </div>
 
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" value="<?= htmlspecialchars($email) ?>" required>
-
-        <div class="info">
-          <p><strong>Role:</strong> <?= htmlspecialchars($role) ?></p>
-          <p><strong>Status:</strong> <?= htmlspecialchars($status) ?></p>
-        </div>
-
-        <button type="submit">Update Profile</button>
-      </form>
-    </div>
+      <button type="submit">Update Profile</button>
+    </form>
 
     <a class="back-link" href="user_dashboard.php">← Back to Dashboard</a>
   </div>
-
 </body>
 </html>
