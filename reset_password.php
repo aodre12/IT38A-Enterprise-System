@@ -1,143 +1,73 @@
 <?php
 session_start();
-require_once 'config.php';
+require 'config.php';
 
-// DEV MODE ONLY – REMOVE FOR PRODUCTION
+// Only logged-in users
 if (!isset($_SESSION['user_id'])) {
-    $_SESSION['user_id'] = 1;
-    $_SESSION['username'] = 'AdminDev';
-    $_SESSION['role'] = 'admin';
-}
-
-// Access Control: Admin Only
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    echo "<h2 style='color:red; text-align:center; margin-top:50px;'>Access Denied. Admin Only.</h2>";
+    header('Location: login.php');
     exit;
 }
 
-$error = '';
+$userId = $_SESSION['user_id'];
 $success = '';
+$error = '';
 
-// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $personnel_id = $_POST['personnel_id'] ?? '';
-    $new_password = $_POST['new_password'] ?? '';
+    $newPassword = $_POST['new_password'] ?? '';
+    $confirmPassword = $_POST['confirm_password'] ?? '';
 
-    if (empty($personnel_id) || empty($new_password)) {
-        $error = "All fields are required.";
+    if (strlen($newPassword) < 6) {
+        $error = "Password must be at least 6 characters.";
+    } elseif ($newPassword !== $confirmPassword) {
+        $error = "Passwords do not match.";
     } else {
-        $hashedPassword = password_hash($new_password, PASSWORD_DEFAULT);
-        $stmt = $conn->prepare("UPDATE personnel SET password = ? WHERE id = ?");
-        $stmt->bind_param("si", $hashedPassword, $personnel_id);
-
+        $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+        $stmt = $conn->prepare("UPDATE users SET password = ? WHERE id = ?");
+        $stmt->bind_param("si", $hashedPassword, $userId);
         if ($stmt->execute()) {
-            $success = "Password reset successfully.";
+            $success = "Password updated successfully.";
         } else {
-            $error = "Error resetting password.";
+            $error = "Failed to update password.";
         }
         $stmt->close();
     }
 }
-
-// Fetch personnel list
-$personnel = $conn->query("SELECT id, name FROM personnel ORDER BY name ASC")->fetch_all(MYSQLI_ASSOC);
-$conn->close();
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Reset Password</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #fef6ec;
-      margin: 0;
-      padding: 40px;
-    }
-
-    .container {
-      max-width: 500px;
-      margin: auto;
-      background-color: #fff;
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: bold;
-    }
-
-    select, input[type="password"] {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-
-    button {
-      background-color: #007bff;
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 5px;
-      cursor: pointer;
-      width: 100%;
-    }
-
-    button:hover {
-      background-color: #0056b3;
-    }
-
-    .success { color: green; text-align: center; margin-bottom: 15px; }
-    .error { color: red; text-align: center; margin-bottom: 15px; }
-
-    .back-link {
-      display: block;
-      text-align: center;
-      margin-top: 20px;
-      text-decoration: none;
-      color: #007bff;
-    }
-
-    .back-link:hover {
-      text-decoration: underline;
-    }
+    body { margin:0; font-family:'Segoe UI',sans-serif; background:#fef6ec; display:flex; align-items:center; justify-content:center; height:100vh; }
+    .container { position:relative; background:#fff; width:400px; padding:40px 30px; border-radius:20px; box-shadow:0 0 12px rgba(0,0,0,0.1); text-align:center; }
+    .header-wave { position:absolute; top:0; left:0; width:100%; height:100px; background:#001F54; border-top-left-radius:20px; border-top-right-radius:20px; clip-path:ellipse(100% 80% at 50% 0%); }
+    h2 { margin-top:100px; font-size:24px; color:#001F54; }
+    input { width:100%; padding:12px; margin:12px 0; border:1px solid #ccc; border-radius:8px; font-size:16px; }
+    button { width:100%; padding:12px; background:#0056b3; color:#fff; border:none; border-radius:8px; font-size:16px; cursor:pointer; }
+    button:hover { background:#003d80; }
+    .message { font-size:14px; margin-top:10px; }
+    .error { color:red; }
+    .success { color:green; }
+    .back-link { margin-top:15px; display:block; text-decoration:none; color:#0056b3; font-weight:bold; }
+    .back-link:hover { text-decoration:underline; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Reset Personnel Password</h2>
+    <div class="header-wave"></div>
+    <h2>Reset Password</h2>
 
-    <?php if ($error): ?><div class="error"><?= htmlspecialchars($error) ?></div><?php endif; ?>
-    <?php if ($success): ?><div class="success"><?= htmlspecialchars($success) ?></div><?php endif; ?>
+    <?php if ($error): ?><div class="message error"><?= htmlspecialchars($error) ?></div><?php endif; ?>
+    <?php if ($success): ?><div class="message success"><?= htmlspecialchars($success) ?></div><?php endif; ?>
 
-    <form method="POST" action="">
-      <label for="personnel_id">Select Personnel</label>
-      <select name="personnel_id" id="personnel_id" required>
-        <option value="">-- Choose Personnel --</option>
-        <?php foreach ($personnel as $p): ?>
-          <option value="<?= $p['id'] ?>"><?= htmlspecialchars($p['name']) ?></option>
-        <?php endforeach; ?>
-      </select>
-
-      <label for="new_password">New Password</label>
-      <input type="password" name="new_password" id="new_password" required>
-
-      <button type="submit">Reset Password</button>
+    <form method="POST">
+      <input type="password" name="new_password" placeholder="New Password" required>
+      <input type="password" name="confirm_password" placeholder="Confirm Password" required>
+      <button type="submit">Update Password</button>
     </form>
 
-    <a class="back-link" href="dashboard.php">← Back to Dashboard</a>
+    <a class="back-link" href="user_dashboard.php">← Back to Dashboard</a>
   </div>
 </body>
 </html>
