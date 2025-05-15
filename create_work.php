@@ -5,22 +5,28 @@ require_once 'config.php';
 $error = '';
 $success = '';
 
+// Dev override (for testing, remove in production)
+if (!isset($_SESSION['user_id'])) {
+    $_SESSION['user_id'] = 1; // Must match an existing personnel.id
+    $_SESSION['username'] = 'AdminDev';
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = trim($_POST['title'] ?? '');
     $description = trim($_POST['description'] ?? '');
     $due_date = $_POST['due_date'] ?? '';
-    $created_by = $_SESSION['username'] ?? 'guest';
+    $created_by = $_SESSION['user_id'] ?? 0; // Correct: use ID, not username
 
     if (empty($title) || empty($description) || empty($due_date)) {
         $error = 'All fields are required.';
     } else {
         $stmt = $conn->prepare("INSERT INTO work_orders (title, description, due_date, created_by) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("ssss", $title, $description, $due_date, $created_by);
+        $stmt->bind_param("sssi", $title, $description, $due_date, $created_by);
 
         if ($stmt->execute()) {
             $success = 'Work order created successfully.';
         } else {
-            $error = 'Failed to create work order.';
+            $error = 'Failed to create work order: ' . $conn->error;
         }
 
         $stmt->close();
@@ -135,7 +141,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <button type="submit">Submit Work Order</button>
     </form>
 
-    <a class="back-link" href="dashboard.php">← Back to Dashboard</a>
+    <a class="back-link" href="admin_dashboard.php">← Back to Dashboard</a>
   </div>
 </body>
 </html>

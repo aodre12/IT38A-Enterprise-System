@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (password_verify($password, $hashed_password)) {
                 $_SESSION['username'] = $username;
                 $_SESSION['role'] = $role;
-                header('Location: dashboard.php');
+                header('Location: user_dashboard.php');
                 exit;
             } else {
                 $error = 'Invalid username or password.';

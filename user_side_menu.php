@@ -1,44 +1,74 @@
 <?php
+// user_side_menu.php
+session_start();
+require 'config.php';  // ensure DB/ session configured
 
-function redirectTo($page) {
-    header("Location: $page.php");
-    exit();
+// Redirect admins away
+if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
+    header('Location: admin_dashboard.php');
+    exit;
 }
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if (isset($_POST['action'])) {
-        $page = $_POST['action'];
-        redirectTo($page);
-    }
+// Require login
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit;
 }
+
+$username = $_SESSION['username'];
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>User Side Menu</title>
-    <link rel="stylesheet" href="sidemenu.css">
-</head>
-<body>
+<style>
+  .sidebar {
+    width: 220px;
+    background-color: #fef6ec;
+    padding: 25px 20px;
+    border-radius: 15px;
+    box-shadow: 0 0 12px rgba(0,0,0,0.1);
+    height: 100vh;
+    position: fixed;
+    top: 0; left: 0;
+    overflow-y: auto;
+    font-family: Arial, sans-serif;
+  }
+  .sidebar h3 {
+    color: #007bff;
+    margin-bottom: 30px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 1.4em;
+  }
+  .sidebar ul {
+    list-style: none; padding: 0; margin: 0;
+  }
+  .sidebar li {
+    margin-bottom: 18px;
+  }
+  .sidebar a {
+    color: #2c3e50;
+    text-decoration: none;
+    font-weight: 600;
+    display: block;
+    padding: 12px 18px;
+    border-radius: 10px;
+    transition: background 0.3s, color 0.3s;
+    box-shadow: 0 0 5px rgba(0,123,255,0.2);
+  }
+  .sidebar a:hover {
+    background-color: #007bff;
+    color: white;
+    box-shadow: 0 0 10px rgba(0,123,255,0.6);
+  }
+</style>
 
-<div class="menu-container">
-    <div class="menu-header">
-        <img src="avatar.png" alt="User Avatar" class="avatar">
-        <span class="welcome-text">WELCOME, <span class="username">USERNAME</span></span>
-    </div>
-    <form method="POST" class="menu-list">
-        <button type="submit" name="action" value="home">Home</button>
-        <button type="submit" name="action" value="profile">My Profile</button>
-        <button type="submit" name="action" value="orders">My Orders</button>
-        <button type="submit" name="action" value="notifications">Notifications</button>
-        <button type="submit" name="action" value="reports">Saved Reports</button>
-        <button type="submit" name="action" value="settings">Settings</button>
-        <button type="submit" name="action" value="support">Help & Support</button>
-        <button type="submit" name="action" value="feedback">Feedback</button>
-        <button type="submit" name="action" value="logout">Logout</button>
-    </form>
+<div class="sidebar">
+  <h3>Welcome, <?= htmlspecialchars($username) ?></h3>
+  <ul>
+    <li><a href="user_dashboard.php">Dashboard</a></li>
+    <li><a href="work_orders.php">My Work Orders</a></li>
+    <li><a href="tasks.php">My Tasks</a></li>
+    <li><a href="profile.php">My Profile</a></li>
+    <li><a href="reset_password.php">Reset Password</a></li>
+    <li><a href="logout.php">Logout</a></li>
+  </ul>
 </div>
-
-</body>
-</html>

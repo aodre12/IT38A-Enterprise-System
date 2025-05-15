@@ -2,15 +2,19 @@
 session_start();
 require 'config.php'; // This should connect to your database
 
-// ✅ Dev Access Override (for development only — remove for production)
+// Dev override: set missing session keys individually
 if (!isset($_SESSION['user_id'])) {
     $_SESSION['user_id'] = 1;
+}
+if (!isset($_SESSION['username'])) {
     $_SESSION['username'] = 'AdminDev';
+}
+if (!isset($_SESSION['role'])) {
     $_SESSION['role'] = 'admin';
 }
 
-// Authentication check
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+// Authentication check with isset()
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     echo "<h2 style='color:red; text-align:center; margin-top:50px;'>Access Denied. Admin Only.</h2>";
     exit;
 }
@@ -35,7 +39,7 @@ $tasks = $conn->query("SELECT t.task, p.name AS assigned, t.status
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Utility ERP Admin Dashboard</title>
+    <title>Admin Dashboard</title>
     <style>
         body { font-family: Arial, sans-serif; background: #f5f6fa; margin: 0; }
         header { background: #2c3e50; color: white; padding: 20px; text-align: center; }
