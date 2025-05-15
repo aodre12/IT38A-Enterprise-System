@@ -47,9 +47,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta charset="UTF-8">
   <title>Login</title>
   <style>
-    body {
+   body {
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
+      font -family: 'Segoe UI', sans-serif;
       background-color: #fef6e4;
       display: flex;
       justify-content: center;

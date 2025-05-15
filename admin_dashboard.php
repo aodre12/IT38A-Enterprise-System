@@ -73,7 +73,7 @@ $tasks = $conn->query("SELECT t.task, p.name AS assigned, t.status
     </div>
 
     <h2>Personnel Management</h2>
-    <button class="btn btn-action">+ Add Personnel</button>
+    <button class="btn btn-action" onclick="location.href='add_personnel.php'">+ Add Personnel</button>
     <table>
         <thead>
             <tr><th>Name</th><th>Role</th><th>Status</th><th>Actions</th></tr>
@@ -85,8 +85,8 @@ $tasks = $conn->query("SELECT t.task, p.name AS assigned, t.status
                 <td><?= htmlspecialchars($p['role']) ?></td>
                 <td><?= htmlspecialchars($p['status']) ?></td>
                 <td>
-                    <button class="btn btn-edit" onclick="editPersonnel(<?= $p['id'] ?>)">Edit</button>
-                    <button class="btn btn-delete" onclick="deactivatePersonnel(<?= $p['id'] ?>)">Deactivate</button>
+                    <button class="btn btn-edit" onclick="location.href='edit_personnel.php?id=<?= $p['id'] ?>'">Edit</button>
+                    <button class="btn btn-delete" onclick="if(confirm('Deactivate this personnel?')) location.href='deactivate_personnel.php?id=<?= $p['id'] ?>'">Deactivate</button>
                 </td>
             </tr>
             <?php endforeach; ?>
@@ -94,7 +94,7 @@ $tasks = $conn->query("SELECT t.task, p.name AS assigned, t.status
     </table>
 
     <h2>Task Assignment & Monitoring</h2>
-    <button class="btn btn-action">+ Assign Task</button>
+    <button class="btn btn-action" onclick="location.href='assign_task.php'">+ Assign Task</button>
     <table>
         <thead>
             <tr><th>Task</th><th>Assigned To</th><th>Status</th></tr>
@@ -111,23 +111,10 @@ $tasks = $conn->query("SELECT t.task, p.name AS assigned, t.status
     </table>
 
     <h2>System Tools</h2>
-    <button class="btn btn-action">Reset Password</button>
-    <button class="btn btn-action">Update Access</button>
-    <button class="btn btn-action">Configure System</button>
-    <button class="btn btn-action">View Audit Logs</button>
+    <button class="btn btn-action" onclick="location.href='reset_password.php'">Reset Password</button>
+    <button class="btn btn-action" onclick="location.href='update_access.php'">Update Access</button>
+    <button class="btn btn-action" onclick="location.href='configure_system.php'">Configure System</button>
+    <button class="btn btn-action" onclick="location.href='view_audit_logs.php'">View Audit Logs</button>
 </div>
-<script>
-    function editPersonnel(id) {
-        alert("Edit Personnel with ID: " + id);
-        // window.location = 'edit_personnel.php?id=' + id;
-    }
-
-    function deactivatePersonnel(id) {
-        if (confirm("Are you sure you want to deactivate this personnel?")) {
-            // Send a request to deactivate_personnel.php?id=id
-            alert("Personnel deactivated (simulated)");
-        }
-    }
-</script>
 </body>
 </html>
