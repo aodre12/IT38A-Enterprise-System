@@ -4,7 +4,7 @@ require 'config.php';
 
 // Authentication check (optional, add your auth logic)
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    echo "<h2 style='color:red; text-align:center; margin-top:50px;'>Access Denied. Admin Only.</h2>";
+    header('Location: admin_login.php');
     exit;
 }
 

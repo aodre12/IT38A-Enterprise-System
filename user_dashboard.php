@@ -1,7 +1,6 @@
 <?php
 session_start();
 require 'config.php';  // DB connection
-
 // Redirect admins
 if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
     header('Location: admin_dashboard.php');
@@ -13,11 +12,23 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-// Load tasks
-$tasksFile = 'tasks.json';
-$tasksData = file_exists($tasksFile)
-    ? json_decode(file_get_contents($tasksFile), true)
-    : ['pending'=>[], 'completed'=>[]];
+$userId = $_SESSION['user_id'];
+
+// Load tasks from DB
+$stmt = $conn->prepare("SELECT id, task, status FROM tasks WHERE assigned_to=? ORDER BY id DESC");
+$stmt->bind_param("i", $userId);
+$stmt->execute();
+$result = $stmt->get_result();
+$pendingTasks = [];
+$completedTasks = [];
+while ($row = $result->fetch_assoc()) {
+    if (isset($row['status']) && $row['status'] === 'Completed') {
+        $completedTasks[] = $row;
+    } else {
+        $pendingTasks[] = $row;
+    }
+}
+$stmt->close();
 
 $username = $_SESSION['username'];
 ?>
@@ -110,6 +121,7 @@ $username = $_SESSION['username'];
       <div class="menu-group">
         <h4>Menu</h4>
         <a href="user_dashboard.php"><i class="fas fa-home"></i> Dashboard</a>
+        <a href="work_orders.php"><i class="fas fa-list"></i> My Work Orders</a>
         <a href="tasks.php"><i class="fas fa-tasks"></i> My Tasks</a>
         <a href="reports.php"><i class="fas fa-chart-line"></i> Reports</a>
         <a href="feedback.php"><i class="fas fa-comment-dots"></i> Submit Feedback</a>
@@ -131,13 +143,13 @@ $username = $_SESSION['username'];
       <div class="card">
         <h3>My Tasks</h3>
         <ul>
-          <?php foreach($tasksData['pending'] as $t): ?>
+          <?php foreach($pendingTasks as $t): ?>
             <li><?= htmlspecialchars($t['task']) ?> <span style="color:#999;font-size:12px;">(Pending)</span></li>
           <?php endforeach; ?>
-          <?php foreach($tasksData['completed'] as $t): ?>
+          <?php foreach($completedTasks as $t): ?>
             <li><?= htmlspecialchars($t['task']) ?> <span style="color:green;font-size:12px;">(Done)</span></li>
           <?php endforeach; ?>
-          <?php if(empty($tasksData['pending']) && empty($tasksData['completed'])): ?>
+          <?php if(empty($pendingTasks) && empty($completedTasks)): ?>
             <li>No tasks found.</li>
           <?php endif; ?>
         </ul>

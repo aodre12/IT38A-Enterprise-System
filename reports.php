@@ -14,12 +14,36 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
+// User id for DB operations
+$userId = $_SESSION['user_id'];
+
+// Use DB if tables exist; otherwise fallback to JSON
+$reportsTableExists = false;
+$res = $conn->query("SHOW TABLES LIKE 'reports'");
+if ($res && $res->num_rows > 0) {
+    $reportsTableExists = true;
+}
+
 // Load existing reports
-$reportsFile = 'reports.json';
-if (file_exists($reportsFile)) {
-    $reports = json_decode(file_get_contents($reportsFile), true);
+$reports = [];
+if ($reportsTableExists) {
+    $stmt = $conn->prepare("SELECT title, report_date, url FROM reports WHERE user_id=? ORDER BY created_at DESC");
+    $stmt->bind_param("i", $userId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    while ($row = $result->fetch_assoc()) {
+        $reports[] = [
+            'title' => $row['title'],
+            'date'  => $row['report_date'],
+            'url'   => $row['url'] ?? '#',
+        ];
+    }
+    $stmt->close();
 } else {
-    $reports = [];
+    $reportsFile = 'reports.json';
+    if (file_exists($reportsFile)) {
+        $reports = json_decode(file_get_contents($reportsFile), true);
+    }
 }
 
 // Handle new report submission
@@ -32,14 +56,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($title === '' || $date === '') {
         $error = 'Both title and date are required.';
     } else {
-        $new = [
-            'title' => $title,
-            'date'  => $date,
-            'url'   => '#'  // or you could collect a URL field
-        ];
-        $reports[] = $new;
-        file_put_contents($reportsFile, json_encode($reports, JSON_PRETTY_PRINT));
-        $success = 'Report added.';
+        if ($reportsTableExists) {
+            $url = '#';
+            $stmt = $conn->prepare("INSERT INTO reports (user_id, title, report_date, url) VALUES (?, ?, ?, ?)");
+            $stmt->bind_param("isss", $userId, $title, $date, $url);
+            $stmt->execute();
+            $stmt->close();
+
+            // Optional audit trail
+            $audit = $conn->prepare("INSERT INTO audit_logs (user_id, action) VALUES (?, ?)");
+            $auditMsg = 'Submitted a report: ' . $title;
+            $audit->bind_param("is", $userId, $auditMsg);
+            $audit->execute();
+            $audit->close();
+
+            header('Location: reports.php');
+            exit;
+        } else {
+            $reportsFile = 'reports.json';
+            if (file_exists($reportsFile)) {
+                $reports = json_decode(file_get_contents($reportsFile), true);
+            } else {
+                $reports = [];
+            }
+
+            $new = [
+                'title' => $title,
+                'date'  => $date,
+                'url'   => '#',
+            ];
+            $reports[] = $new;
+            file_put_contents($reportsFile, json_encode($reports, JSON_PRETTY_PRINT));
+            $success = 'Report added.';
+        }
     }
 }
 

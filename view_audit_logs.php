@@ -4,7 +4,7 @@ require 'config.php';
 
 // Only admin access
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    header('Location: login.php');
+    header('Location: admin_login.php');
     exit;
 }
 

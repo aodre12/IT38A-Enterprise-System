@@ -1,7 +1,14 @@
 <?php
 session_start();
+require 'config.php';
 
 $error = '';
+
+// If already admin logged in, go to dashboard
+if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin' && isset($_SESSION['user_id'])) {
+    header('Location: admin_dashboard.php');
+    exit;
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'] ?? '';
@@ -10,15 +17,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($username) || empty($password)) {
         $error = 'Please enter both username and password.';
     } else {
-        // Hardcoded credentials
-        if ($username === 'admin' && $password === 'admin123') {
-            $_SESSION['username'] = $username;
-            $_SESSION['role'] = 'admin';
-            header('Location: admin_dashboard.php');
-            exit;
-        } else {
-            $error = 'Invalid username or password.';
+        $stmt = $conn->prepare("SELECT id, password, role FROM users WHERE username = ?");
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $stmt->store_result();
+
+        if ($stmt->num_rows === 1) {
+            $stmt->bind_result($userId, $hash, $role);
+            $stmt->fetch();
+
+            if ($role === 'admin' && password_verify($password, $hash)) {
+                $_SESSION['user_id']  = $userId;
+                $_SESSION['username'] = $username;
+                $_SESSION['role']     = 'admin';
+                header('Location: admin_dashboard.php');
+                exit;
+            }
         }
+
+        $error = 'Invalid username or password.';
+        $stmt->close();
     }
 }
 ?>

@@ -1,14 +1,43 @@
 <?php
 // Start the session
 session_start();
+require 'config.php';
 
-// Load work orders from the tasks.json file
-$tasksFile = 'tasks.json';
-if (file_exists($tasksFile)) {
-    $tasksData = json_decode(file_get_contents($tasksFile), true);
-} else {
-    $tasksData = ['pending' => [], 'completed' => []];
+// Redirect admins away
+if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
+    header('Location: admin_dashboard.php');
+    exit;
 }
+
+// Require login
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit;
+}
+
+$userId = $_SESSION['user_id'];
+
+// Load work orders from DB (relevant to this user)
+$stmt = $conn->prepare("
+    SELECT id, title, status, due_date, created_at
+    FROM work_orders
+    WHERE assigned_to=? OR created_by=?
+    ORDER BY id DESC
+");
+$stmt->bind_param("ii", $userId, $userId);
+$stmt->execute();
+$result = $stmt->get_result();
+
+$pendingWorkOrders = [];
+$completedWorkOrders = [];
+while ($row = $result->fetch_assoc()) {
+    if (isset($row['status']) && $row['status'] === 'Completed') {
+        $completedWorkOrders[] = $row;
+    } else {
+        $pendingWorkOrders[] = $row;
+    }
+}
+$stmt->close();
 
 ?>
 
@@ -121,27 +150,36 @@ if (file_exists($tasksFile)) {
     <div class="card">
       <h3>Pending Work Orders</h3>
       <ul class="work-list">
-        <?php foreach ($tasksData['pending'] as $task): ?>
+        <?php foreach ($pendingWorkOrders as $task): ?>
           <li>
-            <?php echo htmlspecialchars($task['task']); ?> (Created: <?php echo $task['created_at']; ?>)
+            <?php echo htmlspecialchars($task['title']); ?> 
+            <?php if (!empty($task['due_date'])): ?>
+              (Due: <?php echo htmlspecialchars($task['due_date']); ?>)
+            <?php endif; ?>
           </li>
         <?php endforeach; ?>
+        <?php if (empty($pendingWorkOrders)): ?>
+          <li>No pending work orders.</li>
+        <?php endif; ?>
       </ul>
     </div>
 
     <div class="card">
       <h3>Completed Work Orders</h3>
       <ul class="work-list">
-        <?php foreach ($tasksData['completed'] as $task): ?>
+        <?php foreach ($completedWorkOrders as $task): ?>
           <li>
-            <?php echo htmlspecialchars($task['task']); ?> (Completed on: <?php echo $task['created_at']; ?>)
+            <?php echo htmlspecialchars($task['title']); ?> (Completed: <?php echo htmlspecialchars($task['created_at'] ?? ''); ?>)
           </li>
         <?php endforeach; ?>
+        <?php if (empty($completedWorkOrders)): ?>
+          <li>No completed work orders.</li>
+        <?php endif; ?>
       </ul>
     </div>
 
     <div class="card">
-      <h3><a href="dashboard.php"><button>Back to Dashboard</button></a></h3>
+      <h3><a href="user_dashboard.php"><button>Back to Dashboard</button></a></h3>
     </div>
 
   </main>

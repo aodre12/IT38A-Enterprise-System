@@ -5,23 +5,33 @@ require_once 'config.php';
 $error = '';
 $success = '';
 
-// Dev override (for testing, remove in production)
-if (!isset($_SESSION['user_id'])) {
-    $_SESSION['user_id'] = 1; // Must match an existing personnel.id
-    $_SESSION['username'] = 'AdminDev';
+// Admin-only access
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    header('Location: admin_login.php');
+    exit;
 }
+
+// Personnel list for assigning work orders
+$personnelList = $conn->query("SELECT id, name FROM personnel ORDER BY status DESC, name ASC");
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = trim($_POST['title'] ?? '');
     $description = trim($_POST['description'] ?? '');
     $due_date = $_POST['due_date'] ?? '';
-    $created_by = $_SESSION['user_id'] ?? 0; // Correct: use ID, not username
+    $assigned_to = $_POST['assigned_to'] ?? null;
+    $created_by = $_SESSION['user_id'];
 
     if (empty($title) || empty($description) || empty($due_date)) {
         $error = 'All fields are required.';
     } else {
-        $stmt = $conn->prepare("INSERT INTO work_orders (title, description, due_date, created_by) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("sssi", $title, $description, $due_date, $created_by);
+        // Allow optional assignment
+        if ($assigned_to === '' || $assigned_to === null) {
+            $assigned_to = null;
+        }
+
+        $stmt = $conn->prepare("INSERT INTO work_orders (title, description, assigned_to, due_date, created_by) VALUES (?, ?, ?, ?, ?)");
+        // title (s), description (s), assigned_to (i), due_date (s), created_by (i)
+        $stmt->bind_param("ssisi", $title, $description, $assigned_to, $due_date, $created_by);
 
         if ($stmt->execute()) {
             $success = 'Work order created successfully.';
@@ -30,9 +40,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $stmt->close();
+        $conn->close();
+        header('Location: admin_dashboard.php');
+        exit;
     }
-
-    $conn->close();
 }
 ?>
 
@@ -137,6 +148,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       <label>Due Date</label>
       <input type="date" name="due_date" required>
+
+      <label>Assign to (optional)</label>
+      <select name="assigned_to">
+        <option value="">Unassigned</option>
+        <?php if ($personnelList): ?>
+          <?php while ($p = $personnelList->fetch_assoc()): ?>
+            <option value="<?= (int)$p['id'] ?>"><?= htmlspecialchars($p['name']) ?></option>
+          <?php endwhile; ?>
+        <?php endif; ?>
+      </select>
 
       <button type="submit">Submit Work Order</button>
     </form>

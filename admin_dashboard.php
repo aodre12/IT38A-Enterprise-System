@@ -2,24 +2,18 @@
 session_start();
 require 'config.php'; // This should connect to your database
 
-// Dev override: set missing session keys individually
-if (!isset($_SESSION['user_id'])) {
-    $_SESSION['user_id'] = 1;
-}
-if (!isset($_SESSION['username'])) {
-    $_SESSION['username'] = 'AdminDev';
-}
-if (!isset($_SESSION['role'])) {
-    $_SESSION['role'] = 'admin';
-}
-
-// Authentication check with isset()
+// Authentication check (admin-only)
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    echo "<h2 style='color:red; text-align:center; margin-top:50px;'>Access Denied. Admin Only.</h2>";
+    header('Location: admin_login.php');
     exit;
 }
 
-$username = $_SESSION['username']; // from login session
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['username'])) {
+    header('Location: admin_login.php');
+    exit;
+}
+
+$username = $_SESSION['username']; // from admin login session
 
 // Fetch stats from DB (sample queries)
 $workOrders = $conn->query("SELECT COUNT(*) FROM work_orders")->fetch_row()[0];
@@ -118,6 +112,10 @@ $tasks = $conn->query("SELECT t.task, p.name AS assigned, t.status
     <button class="btn btn-action" onclick="location.href='reset_password.php'">Reset Password</button>
     <button class="btn btn-action" onclick="location.href='update_access.php'">Update Access</button>
     <button class="btn btn-action" onclick="location.href='configure_system.php'">Configure System</button>
+    <button class="btn btn-action" onclick="location.href='create_work.php'">+ Create Work Order</button>
+    <button class="btn btn-action" onclick="location.href='admin_work_orders.php'">Manage Work Orders</button>
+    <button class="btn btn-action" onclick="location.href='admin_reports.php'">Manage Reports</button>
+    <button class="btn btn-action" onclick="location.href='admin_feedback.php'">Manage Feedback</button>
     <button class="btn btn-action" onclick="location.href='view_audit_logs.php'">View Audit Logs</button>
 </div>
 </body>

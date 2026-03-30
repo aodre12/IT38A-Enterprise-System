@@ -24,9 +24,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['username'] = $username;
                 $_SESSION['role']     = $role;
 
-                header($role === 'admin'
-                    ? 'Location: admin_dashboard.php'
-                    : 'Location: user_dashboard.php');
+                // Admin must login via dedicated admin flow.
+                if ($role === 'admin') {
+                    // Clear any session created by this login attempt.
+                    session_unset();
+                    header('Location: admin_login.php');
+                    exit;
+                }
+
+                header('Location: user_dashboard.php');
                 exit;
             }
         }

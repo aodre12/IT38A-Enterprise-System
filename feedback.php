@@ -11,6 +11,15 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
+$userId = $_SESSION['user_id'];
+
+// Use DB if tables exist; otherwise fallback.
+$feedbackTableExists = false;
+$res = $conn->query("SHOW TABLES LIKE 'feedback'");
+if ($res && $res->num_rows > 0) {
+    $feedbackTableExists = true;
+}
+
 $error = '';
 $success = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -18,11 +27,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($message === '') {
         $error = 'Feedback cannot be empty.';
     } else {
-        // Normally insert into DB; here we simulate success
-        // $stmt = $conn->prepare("INSERT INTO feedback (user_id,message) VALUES (?,?)");
-        // $stmt->bind_param("is", $_SESSION['user_id'], $message);
-        // $stmt->execute();
-        $success = 'Thank you for your feedback!';
+        if ($feedbackTableExists) {
+            $stmt = $conn->prepare("INSERT INTO feedback (user_id, message) VALUES (?, ?)");
+            $stmt->bind_param("is", $userId, $message);
+            $stmt->execute();
+            $stmt->close();
+
+            // Optional audit trail
+            $audit = $conn->prepare("INSERT INTO audit_logs (user_id, action) VALUES (?, ?)");
+            $auditMsg = 'Submitted feedback';
+            $audit->bind_param("is", $userId, $auditMsg);
+            $audit->execute();
+            $audit->close();
+
+            $success = 'Thank you for your feedback!';
+        } else {
+            // Fallback: store locally so submission isn't lost.
+            $feedbackFile = 'feedback.json';
+            $feedback = [];
+            if (file_exists($feedbackFile)) {
+                $feedback = json_decode(file_get_contents($feedbackFile), true) ?: [];
+            }
+            $feedback[] = [
+                'user_id' => $userId,
+                'message' => $message,
+                'created_at' => date('Y-m-d H:i:s')
+            ];
+            file_put_contents($feedbackFile, json_encode($feedback, JSON_PRETTY_PRINT));
+
+            $success = 'Thank you for your feedback!';
+        }
     }
 }
 ?>

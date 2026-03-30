@@ -14,38 +14,68 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-// Load tasks
-$tasksFile = 'tasks.json';
-if (file_exists($tasksFile)) {
-    $tasksData = json_decode(file_get_contents($tasksFile), true);
-} else {
-    $tasksData = ['pending'=>[], 'completed'=>[]];
+// User id for DB operations
+$userId = $_SESSION['user_id'];
+
+// Handle task actions (DB-backed)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+    $action = $_POST['action'];
+
+    if ($action === 'complete' && isset($_POST['task_id'])) {
+        $taskId = $_POST['task_id'];
+
+        // Only allow completing tasks assigned to this user
+        $stmt = $conn->prepare("UPDATE tasks SET status='Completed' WHERE id=? AND assigned_to=? AND status!='Completed'");
+        $stmt->bind_param("ii", $taskId, $userId);
+        $stmt->execute();
+
+        // Optional audit trail
+        $stmt->close();
+        $audit = $conn->prepare("INSERT INTO audit_logs (user_id, action) VALUES (?, ?)");
+        $auditMsg = 'Completed a task (ID: ' . $taskId . ')';
+        $audit->bind_param("is", $userId, $auditMsg);
+        $audit->execute();
+        $audit->close();
+
+        header('Location: tasks.php');
+        exit;
+    }
+
+    if ($action === 'add' && !empty(trim($_POST['new_task']))) {
+        $taskText = trim($_POST['new_task']);
+
+        $stmt = $conn->prepare("INSERT INTO tasks (task, assigned_to, status) VALUES (?, ?, 'Pending')");
+        $stmt->bind_param("si", $taskText, $userId);
+        $stmt->execute();
+        $stmt->close();
+
+        // Optional audit trail
+        $audit = $conn->prepare("INSERT INTO audit_logs (user_id, action) VALUES (?, ?)");
+        $auditMsg = 'Added a new task: ' . $taskText;
+        $audit->bind_param("is", $userId, $auditMsg);
+        $audit->execute();
+        $audit->close();
+
+        header('Location: tasks.php');
+        exit;
+    }
 }
 
-// Handle marking a task complete
-if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['action'])) {
-    if ($_POST['action']==='complete' && isset($_POST['task_id'])) {
-        $id = $_POST['task_id'];
-        foreach ($tasksData['pending'] as $i => $t) {
-            if ($t['id'] === $id) {
-                $tasksData['completed'][] = $t;
-                array_splice($tasksData['pending'], $i, 1);
-                break;
-            }
-        }
+// Load tasks from DB
+$stmt = $conn->prepare("SELECT id, task, status FROM tasks WHERE assigned_to=? ORDER BY id DESC");
+$stmt->bind_param("i", $userId);
+$stmt->execute();
+$result = $stmt->get_result();
+$pendingTasks = [];
+$completedTasks = [];
+while ($row = $result->fetch_assoc()) {
+    if (isset($row['status']) && $row['status'] === 'Completed') {
+        $completedTasks[] = $row;
+    } else {
+        $pendingTasks[] = $row;
     }
-    // Handle new task
-    if ($_POST['action']==='add' && !empty(trim($_POST['new_task']))) {
-        $tasksData['pending'][] = [
-            'id'=>uniqid(),
-            'task'=>trim($_POST['new_task']),
-            'created_at'=>date('Y-m-d H:i:s')
-        ];
-    }
-    file_put_contents($tasksFile, json_encode($tasksData, JSON_PRETTY_PRINT));
-    header('Location: tasks.php');
-    exit;
 }
+$stmt->close();
 
 $username = $_SESSION['username'];
 ?>
@@ -85,7 +115,7 @@ $username = $_SESSION['username'];
 
     <!-- Pending & Completed Tasks -->
     <ul class="task-list">
-      <?php foreach ($tasksData['pending'] as $t): ?>
+      <?php foreach ($pendingTasks as $t): ?>
       <li>
         <span><?= htmlspecialchars($t['task']) ?></span>
         <form method="POST" action="tasks.php">
@@ -96,17 +126,17 @@ $username = $_SESSION['username'];
       </li>
       <?php endforeach; ?>
 
-      <?php if (empty($tasksData['pending'])): ?>
+      <?php if (empty($pendingTasks)): ?>
         <li><em>No pending tasks.</em></li>
       <?php endif; ?>
 
-      <?php foreach ($tasksData['completed'] as $t): ?>
+      <?php foreach ($completedTasks as $t): ?>
       <li style="opacity:0.6;">
         <span><?= htmlspecialchars($t['task']) ?> (Done)</span>
       </li>
       <?php endforeach; ?>
 
-      <?php if (empty($tasksData['completed'])): ?>
+      <?php if (empty($completedTasks)): ?>
         <li><em>No completed tasks.</em></li>
       <?php endif; ?>
     </ul>
