@@ -1,11 +1,11 @@
 <?php
 // user_side_menu.php
 session_start();
-require 'config.php';  // ensure DB/ session configured
+require 'Config.php';
 
 // Redirect admins away
 if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
-    header('Location: admin_dashboard.php');
+    header('Location: ../admin/dashboard.php');
     exit;
 }
 
@@ -64,7 +64,7 @@ $username = $_SESSION['username'];
 <div class="sidebar">
   <h3>Welcome, <?= htmlspecialchars($username) ?></h3>
   <ul>
-    <li><a href="user_dashboard.php">Dashboard</a></li>
+    <li><a href="../user/dashboard.php">Dashboard</a></li>
     <li><a href="work_orders.php">My Work Orders</a></li>
     <li><a href="tasks.php">My Tasks</a></li>
     <li><a href="profile.php">My Profile</a></li>

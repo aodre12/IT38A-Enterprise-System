@@ -50,6 +50,7 @@
       border: 1px solid #ccc;
       border-radius: 8px;
       font-size: 16px;
+      box-sizing: border-box;
     }
 
     button {
@@ -87,13 +88,8 @@
       font-size: 14px;
     }
 
-    .error {
-      color: red;
-    }
-
-    .success {
-      color: green;
-    }
+    .error { color: red; }
+    .success { color: green; }
   </style>
 </head>
 <body>
@@ -104,4 +100,12 @@
     <form action="login.php" method="POST">
       <input type="text" name="username" placeholder="Username" required>
       <input type="password" name="password" placeholder="Password" required>
-      <button type="submit">Login
+      <button type="submit">Login</button>
+    </form>
+
+    <div class="signup-prompt">
+      Don't have an account? <a href="register.php">Sign up</a>
+    </div>
+  </div>
+</body>
+</html>

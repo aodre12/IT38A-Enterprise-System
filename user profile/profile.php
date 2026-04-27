@@ -1,6 +1,6 @@
 <?php
 session_start();
-require 'config.php';
+require 'Config.php';
 
 // Redirect if not logged in or is admin
 if (!isset($_SESSION['user_id'])) {
@@ -8,7 +8,7 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 if ($_SESSION['role'] === 'admin') {
-    header('Location: admin_dashboard.php');
+    header('Location: ../admin/dashboard.php');
     exit;
 }
 
@@ -151,7 +151,7 @@ $stmt->close();
       <button type="submit">Update Profile</button>
     </form>
 
-    <a class="back-link" href="user_dashboard.php">← Back to Dashboard</a>
+    <a class="back-link" href="../user/dashboard.php">← Back to Dashboard</a>
   </div>
 </body>
 </html>

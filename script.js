@@ -1,10 +1,15 @@
 document.querySelectorAll('.sidebar a').forEach(link => {
     link.addEventListener('click', function(event) {
-        event.preventDefault(); // Prevent default anchor behavior
-        const contentArea = document.getElementById('content');
-        const section = this.getAttribute('href').substring(1); // Get the section name
+        const href = this.getAttribute('href');
+        // Only intercept hash-based links
+        if (!href || !href.startsWith('#')) return;
 
-        // Update content based on the selected section
+        event.preventDefault();
+        const contentArea = document.getElementById('content');
+        if (!contentArea) return;
+
+        const section = href.substring(1);
+
         switch (section) {
             case 'home':
                 contentArea.innerHTML = '<h2>Home</h2><p>Welcome to the home section.</p>';
@@ -29,4 +34,3 @@ document.querySelectorAll('.sidebar a').forEach(link => {
         }
     });
 });
-``
